@@ -1,4 +1,6 @@
 import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
 
 class PII {
     /** 
@@ -42,6 +44,24 @@ class PII {
     /* The `int[]`s are maps from men to women */
     int[] initiationPhase(Random rng) {
         return randomPermutation(rng, n);
+    }
+
+    /** 2D index into an `n` x `n` array */
+    static record Index(int y, int x) {}
+
+    List<Index> unstablePairs(int[] mensMatches) {
+        int[] womensMatches = invertPermutation(mensMatches);
+        List<Index> out = new ArrayList<>();
+        for (int y = 0; y < n; y++) { // men
+            int matchedWoman = womensMatches[y];
+            for (int x = 0; x < n; x++) { // women
+                int matchedMan = mensMatches[x];
+                // Do y and x prefer to cheat with each other
+                if (malePrefs[y][x] < malePrefs[y][matchedWoman] && femalePrefs[x][y] < femalePrefs[x][matchedMan])
+                    out.add(new Index(y, x));
+            }
+        }
+        return out;
     }
 
     /* The `int[]`s are maps from men to women */
