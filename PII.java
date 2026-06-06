@@ -21,41 +21,56 @@ class PII {
         this.n = malePrefs.length;
     }
 
-    static int[] invertPermutation(int[] perm) {
-        int[] out = new int[perm.length];
-        for (int i = 0; i < perm.length; i++)
-            out[perm[i]] = i;
-        return out;
-    }
-
-    static int[] randomPermutation(Random rng, int n) {
-        int[] out = new int[n];
-        for (int i = 0; i < n; i++)
-            out[i] = i;
-        for (int i = n - 1; i >= 1; i--) {
-            int j = rng.nextInt(i + 1);
-            int tmp = out[i];
-            out[i] = out[j];
-            out[j] = tmp;
+    static class Permutation {
+        private int[] perm;
+        
+        Permutation(int[] fn) {
+            this.perm = fn;
         }
-        return out;
+        
+        int size() {
+            return perm.length;
+        }
+
+        int get(int index) {
+            return perm[index];
+        }
+
+        Permutation invert() {
+            int[] out = new int[size()];
+            for (int i = 0; i < out.length; i++)
+                out[perm[i]] = i;
+            return new Permutation(out);
+        }
+
+        static Permutation random(Random rng, int n) {
+            int[] out = new int[n];
+            for (int i = 0; i < n; i++)
+                out[i] = i;
+            for (int i = n - 1; i >= 1; i--) {
+                int j = rng.nextInt(i + 1);
+                int tmp = out[i];
+                out[i] = out[j];
+                out[j] = tmp;
+            }
+            return new Permutation(out);
+        }
     }
 
-    /* The `int[]`s are maps from men to women */
-    int[] initiationPhase(Random rng) {
-        return randomPermutation(rng, n);
+    Permutation initiationPhase(Random rng) {
+        return Permutation.random(rng, n);
     }
 
     /** 2D index into an `n` x `n` array */
     static record Index(int y, int x) {}
 
-    List<Index> unstablePairs(int[] mensMatches) {
-        int[] womensMatches = invertPermutation(mensMatches);
+    List<Index> unstablePairs(Permutation mensMatches) {
+        Permutation womensMatches = mensMatches.invert();
         List<Index> out = new ArrayList<>();
         for (int y = 0; y < n; y++) { // men
-            int matchedWoman = womensMatches[y];
+            int matchedWoman = womensMatches.get(y);
             for (int x = 0; x < n; x++) { // women
-                int matchedMan = mensMatches[x];
+                int matchedMan = mensMatches.get(x);
                 // Do y and x prefer to cheat with each other
                 if (malePrefs[y][x] < malePrefs[y][matchedWoman] && femalePrefs[x][y] < femalePrefs[x][matchedMan])
                     out.add(new Index(y, x));
@@ -65,7 +80,7 @@ class PII {
     }
 
     /* The `int[]`s are maps from men to women */
-    int[] iterationPhase(int[] matches) {
+    int[] iterationPhase(Permutation mensMatches) {
         throw new RuntimeException("Not implemented yet"); // TODO
     }
 }
