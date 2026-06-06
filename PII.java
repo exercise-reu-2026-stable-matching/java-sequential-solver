@@ -45,6 +45,7 @@ class PII {
 
         static Permutation random(Random rng, int n) {
             int[] out = new int[n];
+            // Fisher-Yates shuffle
             for (int i = 0; i < n; i++)
                 out[i] = i;
             for (int i = n - 1; i >= 1; i--) {
