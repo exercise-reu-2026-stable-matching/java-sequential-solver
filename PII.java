@@ -1,7 +1,16 @@
 import java.util.Random;
 
 class PII {
-    final int[][] malePrefs, femalePrefs;
+    /** 
+     * `malePrefs[y][x]` is male `y`'s ranking of woman `x`, a.k.a. the left value at index yx in the 
+     * ranking matrix in the original PII paper.
+     */
+    final int[][] malePrefs;
+    /** 
+     * `femalePrefs[x][y]` is female `x`'s ranking of man `y`, a.k.a. the right value at index yx in the 
+     * *transpose* of the ranking matrix in the original PII paper.
+     */
+    final int[][] femalePrefs;
     final int n;
 
     PII(int[][] malePrefs, int[][] femalePrefs) {
