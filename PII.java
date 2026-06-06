@@ -35,7 +35,7 @@ class PII {
         return randomPermutation(rng, n);
     }
 
-    /* The `int[]` are maps from men to women */
+    /* The `int[]`s are maps from men to women */
     int[] iterationPhase(int[] matches) {
         throw new RuntimeException("Not implemented yet"); // TODO
     }
