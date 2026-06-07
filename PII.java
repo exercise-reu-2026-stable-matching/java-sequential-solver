@@ -140,7 +140,9 @@ class PII {
         throw new RuntimeException("Not implemented yet"); // TODO
     }
 
-    public static void main(String[] args) {
+    // Initial matching in the example from the slides
+    static final PII slidesExample;
+    static {
         int[][] malePrefs = {
             { 4, 2, 3, 1 },
             { 3, 1, 2, 4 },
@@ -153,12 +155,15 @@ class PII {
             { 4, 2, 3, 1 },
             { 3, 1, 4, 2 }
         };
-        PII pii = new PII(malePrefs, femalePrefs);
-        
+        slidesExample = new PII(malePrefs, femalePrefs);
+    }
+
+    public static void main(String[] args) {
+        PII pii = slidesExample;
+
         // Random rng = new Random(5);
         // Permutation mensMatches = pii.initiationPhase(rng);
 
-        // Initial matching in the example from the slides
         Permutation mensMatches = new Permutation(new int[]{ 0, 3, 2, 1 });
         System.out.println("initiationPhase mensMatches: " + mensMatches);
         
@@ -180,6 +185,5 @@ class PII {
             System.out.print(index + " ");
         System.out.println();
     }
-
 
 }
