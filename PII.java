@@ -93,7 +93,14 @@ class PII {
         return (malePrefs[y][x] < malePrefs[y][matchedWoman] && femalePrefs[x][y] < femalePrefs[x][matchedMan]);
     }
 
+    void checkPermLength(Permutation mensMatches) {
+        if (mensMatches.size() != n)
+            throw new RuntimeException("Wrong size for permutation");
+    }
+
     List<Index> nm1GeneratingPairs(Permutation mensMatches) {
+        checkPermLength(mensMatches);
+
         Permutation womensMatches = mensMatches.invert();
         List<Index> out = new ArrayList<>();
         for (int y = 0; y < n; y++) { // men
@@ -110,6 +117,8 @@ class PII {
     }
 
     List<Index> nm1Pairs(Permutation mensMatches) {
+        checkPermLength(mensMatches);
+
         List<Index> nm1GeneratingPairs = nm1GeneratingPairs(mensMatches);
         // this is pretty inefficient but it's easy to understand
         Map<Integer, Integer> generatingRowsOfCols = new HashMap<>();
@@ -126,6 +135,8 @@ class PII {
 
     /** Return a map from an nm1-pair to its corresponding nm2-generating pair. I think this map is injective (TODO?) */
     Map<Index, Index> nm2GeneratingPairs(Permutation mensMatches) {
+        checkPermLength(mensMatches);
+
         List<Index> nm1Pairs = nm1Pairs(mensMatches);
         Map<Index, Index> out = new HashMap<>();
         Permutation womensMatches = mensMatches.invert();
@@ -154,6 +165,8 @@ class PII {
      * There are at most two of these values per set (TODO confirm this). 
      */
     Set<Index>[] nm2GeneratingPairsAssociatedWithMatchingPair(Permutation mensMatches) {
+        checkPermLength(mensMatches);
+
         Set<Index>[] out = new Set[n];
         for (int i = 0; i < n; i++)
             out[i] = new HashSet<>();
