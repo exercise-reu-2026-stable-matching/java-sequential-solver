@@ -3,6 +3,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 
 class PII {
     /** 
@@ -150,9 +152,9 @@ class PII {
     /** Return a length-`n` array where the value at index `i` represents all the 
      * nm2-generating pairs `a_{l, k}` associated with matching pair `a_{i, k}`. */
     List<Index>[] nm2GeneratingPairsAssociatedWithMatchingPair(Permutation mensMatches) {
-        List<Index>[] out = new List[n];
+        Set<Index>[] out = new Set[n];
         for (int i = 0; i < n; i++)
-            out[i] = new ArrayList<>();
+            out[i] = new HashSet<>();
         
         Map<Index, Index> nm2GeneratingPairs = nm2GeneratingPairs(mensMatches);
         for (var e : nm2GeneratingPairs.entrySet()) {
@@ -167,10 +169,13 @@ class PII {
             assert mensMatches.get(l) == j;
 
             out[i].add(nm2GeneratingPair);
-            out[l].add(nm2GeneratingPair); // TODO won't this cause duplicates? Is that ok?
+            out[l].add(nm2GeneratingPair);
         }
 
-        return out;
+        List<Index>[] outLists = new List[n];
+        for (int i = 0; i < n; i++)
+            outLists[i] = List.copyOf(out[i]); // TODO maybe we don't need to deduplicate like this
+        return outLists;
     }
 
     Permutation iterationPhase(Permutation mensMatches) {
@@ -243,6 +248,13 @@ class PII {
         System.out.print("nm2 generating pairs: ");
         for (var e : nm2GeneratingPairs.entrySet())
             System.out.print(e.getKey() + ": " + e.getValue() + " ");
+        System.out.println();
+
+        List<Index>[] nm2GeneratingPairsAssociatedWithMatchingPairs = 
+            pii.nm2GeneratingPairsAssociatedWithMatchingPair(mensMatches);
+        System.out.print("matching pairs to associated nm2 generating pairs: ");
+        for (int i = 0; i < pii.n; i++)
+            System.out.print(i + ": " + nm2GeneratingPairsAssociatedWithMatchingPairs[i] + ", ");
         System.out.println();
     }
 
