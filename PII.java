@@ -150,7 +150,9 @@ class PII {
     }
 
     /** Return a length-`n` array where the value at index `i` represents all the 
-     * nm2-generating pairs `a_{l, k}` associated with matching pair `a_{i, k}`. */
+     * nm2-generating pairs `a_{l, k}` associated with matching pair `a_{i, k}` and `a_{l, j}`.
+     * There are at most two of these values per set (TODO confirm this). 
+     */
     Set<Index>[] nm2GeneratingPairsAssociatedWithMatchingPair(Permutation mensMatches) {
         Set<Index>[] out = new Set[n];
         for (int i = 0; i < n; i++)
@@ -173,6 +175,29 @@ class PII {
         }
 
         return out; // TODO maybe this can be a list, idk about duplication though
+    }
+
+    /** Return an adjacency list for each nm2-generating pair in the nm2-generating graph G_M.
+     * The degree of each vertex is at most two.
+     */
+    // Use sets so that two couples cheating on each other with each other don't have duplicate edges
+    Map<Index, Set<Index>> nm2GeneratingGraph(Permutation mensMatches) {
+        Map<Index, Set<Index>> out = new HashMap<>();
+        Set<Index>[] nm2GeneratingPairsAssociatedWithMatchingPairs = nm2GeneratingPairsAssociatedWithMatchingPair(mensMatches);
+        for (int y = 0; y < n; y++) { // men
+            Index[] nm2GeneratingPairs = nm2GeneratingPairsAssociatedWithMatchingPairs[y].toArray(new Index[0]);
+            assert nm2GeneratingPairs.length <= 2;
+            for (Index u : nm2GeneratingPairs) // Make sure even singleton chains have a key in `out`
+                out.putIfAbsent(u, new HashSet<>());
+            if (nm2GeneratingPairs.length == 2) {
+                // u and v have a common matching pair `(y, mensMatches.get(y))`
+                Index u = nm2GeneratingPairs[0];
+                Index v = nm2GeneratingPairs[1];
+                out.get(u).add(v);
+                out.get(v).add(u);
+            }
+        }
+        return out;
     }
 
     Permutation iterationPhase(Permutation mensMatches) {
@@ -252,6 +277,12 @@ class PII {
         System.out.print("matching pairs to associated nm2 generating pairs: ");
         for (int i = 0; i < pii.n; i++)
             System.out.print(i + ": " + nm2GeneratingPairsAssociatedWithMatchingPairs[i] + ", ");
+        System.out.println();
+
+        Map<Index, Set<Index>> nm2GeneratingGraph = pii.nm2GeneratingGraph(mensMatches);
+        System.out.print("nm2-generating graph: ");
+        for (var e : nm2GeneratingGraph.entrySet())
+            System.out.print(e.getKey() + ": " + e.getValue() + " ");
         System.out.println();
     }
 
