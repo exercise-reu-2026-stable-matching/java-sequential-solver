@@ -160,16 +160,31 @@ class PII {
         return out;
     }
 
-    /** Return a length-`n` array where the value at index `i` represents all the 
-     * nm2-generating pairs `a_{l, k}` associated with matching pair `a_{i, k}` and `a_{l, j}`.
-     * There are at most two of these values per set (TODO confirm this). 
-     */
-    Set<Index>[] nm2GeneratingPairsAssociatedWithMatchingPair(Permutation mensMatches) {
+    // inRow and inCol refer to matching pair
+    static class Node {
+        Index inRow, inCol;
+
+        Node() {
+            inRow = inCol = null;
+        }
+
+        @Override
+        public String toString() {
+            return "(" + inRow + ", " + inCol + ")";
+        }
+    }
+
+    /** Return a length-`n` array. For every matching pair `a_{y, x}`, puts any nm2-generating pairs `a_{y, w}` and/or `a_{z, x}`
+     * at index `y`. Therefore, there are at most two of these values per set. */
+    // Equivalently, for every nm2-generating pair `a_{l, k}`, there are two matching pairs `a_{i, k}` and `a_{l, j}`,
+    // where `i` is the man matched with woman `k` and `j` is the woman matched with man `l`.
+    // We put `a_{l, k}` at both indices `i` and `l` (the men).
+    Node[] nm2GeneratingPairsAssociatedWithMatchingPair(Permutation mensMatches) {
         checkPermLength(mensMatches);
 
-        Set<Index>[] out = new Set[n];
+        Node[] out = new Node[n];
         for (int i = 0; i < n; i++)
-            out[i] = new HashSet<>();
+            out[i] = new Node();
         
         Map<Index, Index> nm2GeneratingPairs = nm2GeneratingPairs(mensMatches);
         for (var e : nm2GeneratingPairs.entrySet()) {
@@ -183,11 +198,11 @@ class PII {
             assert mensMatches.get(i) == k;
             assert mensMatches.get(l) == j;
 
-            out[i].add(nm2GeneratingPair);
-            out[l].add(nm2GeneratingPair);
+            out[i].inRow = nm2GeneratingPair;
+            out[l].inCol = nm2GeneratingPair;
         }
 
-        return out; // TODO maybe this can be a list, idk about duplication though
+        return out;
     }
 
     /** Return an adjacency list for each nm2-generating pair in the nm2-generating graph G_M.
@@ -285,18 +300,18 @@ class PII {
             System.out.print(e.getKey() + ": " + e.getValue() + " ");
         System.out.println();
 
-        Set<Index>[] nm2GeneratingPairsAssociatedWithMatchingPairs = 
+        Node[] nm2GeneratingPairsAssociatedWithMatchingPairs = 
             pii.nm2GeneratingPairsAssociatedWithMatchingPair(mensMatches);
         System.out.print("matching pairs to associated nm2 generating pairs: ");
         for (int i = 0; i < pii.n; i++)
             System.out.print(i + ": " + nm2GeneratingPairsAssociatedWithMatchingPairs[i] + ", ");
         System.out.println();
 
-        Map<Index, Set<Index>> nm2GeneratingGraph = pii.nm2GeneratingGraph(mensMatches);
-        System.out.print("nm2-generating graph: ");
-        for (var e : nm2GeneratingGraph.entrySet())
-            System.out.print(e.getKey() + ": " + e.getValue() + " ");
-        System.out.println();
+        // Map<Index, Node> nm2GeneratingGraph = pii.nm2GeneratingGraph(mensMatches);
+        // System.out.print("nm2-generating graph: ");
+        // for (var e : nm2GeneratingGraph.entrySet())
+        //     System.out.print(e.getKey() + ": " + e.getValue() + " ");
+        // System.out.println();
     }
 
 }
