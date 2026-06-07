@@ -122,16 +122,17 @@ class PII {
         return out;
     }
 
-    List<Index> nm2GeneratingPairs(Permutation mensMatches) {
+    /** Return a map from an nm1-pair to its corresponding nm2-generating pair */
+    Map<Index, Index> nm2GeneratingPairs(Permutation mensMatches) {
         List<Index> nm1Pairs = nm1Pairs(mensMatches);
-        List<Index> out = new ArrayList<>();
+        Map<Index, Index> out = new HashMap<>();
         Permutation womensMatches = mensMatches.invert();
         for (Index pair : nm1Pairs) {
             int i = pair.y();
             int j = pair.x();
             int k = mensMatches.get(i);
             int l = womensMatches.get(j);
-            out.add(new Index(l, k)); // TODO is this correct
+            out.put(pair, new Index(l, k));
         }
         return out;
     }
@@ -202,10 +203,10 @@ class PII {
             System.out.print(index + " ");
         System.out.println();
 
-        List<Index> nm2GeneratingPairs = pii.nm2GeneratingPairs(mensMatches);
+        Map<Index, Index> nm2GeneratingPairs = pii.nm2GeneratingPairs(mensMatches);
         System.out.print("nm2 generating pairs: ");
-        for (Index index : nm2GeneratingPairs)
-            System.out.print(index + " ");
+        for (var e : nm2GeneratingPairs.entrySet())
+            System.out.print(e.getKey() + ": " + e.getValue() + " ");
         System.out.println();
     }
 
