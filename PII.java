@@ -160,11 +160,11 @@ class PII {
         return out;
     }
 
-    // inRow and inCol refer to matching pair
-    static class Node {
+    // For some matching pair (not in this class), two points that each share the row and column of the matching pair, respectively
+    static class IndexForMatchingPair {
         Index inRow, inCol;
 
-        Node() {
+        IndexForMatchingPair() {
             inRow = inCol = null;
         }
 
@@ -179,12 +179,12 @@ class PII {
     // Equivalently, for every nm2-generating pair `a_{l, k}`, there are two matching pairs `a_{i, k}` and `a_{l, j}`,
     // where `i` is the man matched with woman `k` and `j` is the woman matched with man `l`.
     // We put `a_{l, k}` at both indices `i` and `l` (the men).
-    Node[] nm2GeneratingPairsAssociatedWithMatchingPair(Permutation mensMatches) {
+    IndexForMatchingPair[] nm2GeneratingPairsAssociatedWithMatchingPair(Permutation mensMatches) {
         checkPermLength(mensMatches);
 
-        Node[] out = new Node[n];
+        IndexForMatchingPair[] out = new IndexForMatchingPair[n];
         for (int i = 0; i < n; i++)
-            out[i] = new Node();
+            out[i] = new IndexForMatchingPair();
         
         Map<Index, Index> nm2GeneratingPairs = nm2GeneratingPairs(mensMatches);
         for (var e : nm2GeneratingPairs.entrySet()) {
@@ -300,7 +300,7 @@ class PII {
             System.out.print(e.getKey() + ": " + e.getValue() + " ");
         System.out.println();
 
-        Node[] nm2GeneratingPairsAssociatedWithMatchingPairs = 
+        IndexForMatchingPair[] nm2GeneratingPairsAssociatedWithMatchingPairs = 
             pii.nm2GeneratingPairsAssociatedWithMatchingPair(mensMatches);
         System.out.print("matching pairs to associated nm2 generating pairs: ");
         for (int i = 0; i < pii.n; i++)
