@@ -158,13 +158,36 @@ class PII {
         slidesExample = new PII(malePrefs, femalePrefs);
     }
 
+    // Jeffrey's example that we worked out together
+    static final PII jeffreyExample;
+    static {
+        int[][] malePrefs = {
+            { 3, 4, 5, 1, 6, 2 },
+            { 1, 5, 2, 6, 4, 3 },
+            { 6, 1, 4, 5, 2, 3 },
+            { 5, 6, 1, 3, 2, 4 },
+            { 2, 4, 5, 1, 6, 3 },
+            { 1, 3, 2, 5, 4, 6 }
+        };
+        int[][] femalePrefs = {
+            { 2, 4, 5, 1, 6, 3 },
+            { 2, 5, 3, 6, 1, 4 },
+            { 1, 2, 6, 5, 4, 3 },
+            { 2, 4, 1, 6, 5, 3 },
+            { 6, 5, 4, 2, 3, 1 },
+            { 3, 5, 1, 6, 2, 4 }
+        };
+        jeffreyExample = new PII(malePrefs, femalePrefs);
+    }
+
     public static void main(String[] args) {
-        PII pii = slidesExample;
+        PII pii = jeffreyExample;
 
         // Random rng = new Random(5);
         // Permutation mensMatches = pii.initiationPhase(rng);
 
-        Permutation mensMatches = new Permutation(new int[]{ 0, 3, 2, 1 });
+        // Permutation mensMatches = new Permutation(new int[]{ 0, 3, 2, 1 });
+        Permutation mensMatches = new Permutation(new int[]{ 0, 1, 2, 3, 4, 5 });
         System.out.println("initiationPhase mensMatches: " + mensMatches);
         
         List<Index> nm1GeneratingPairs = pii.nm1GeneratingPairs(mensMatches);
