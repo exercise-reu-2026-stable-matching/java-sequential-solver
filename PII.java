@@ -1,7 +1,5 @@
 import java.util.Random;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
 
 class PII {
@@ -67,31 +65,18 @@ class PII {
     /** 2D index into an `n` x `n` array */
     static record Index(int y, int x) {}
 
-    boolean isUnstablePair(Permutation mensMatches, Permutation womensMatches, int y, int x) {
-        int matchedWoman = womensMatches.get(y);
-        int matchedMan = mensMatches.get(x);
-        return malePrefs[y][x] < malePrefs[y][matchedWoman] && femalePrefs[x][y] < femalePrefs[x][matchedMan];
-    }
-
-    List<Index> nm1Pairs(Permutation mensMatches) {
+    List<Index> unstablePairs(Permutation mensMatches) {
         Permutation womensMatches = mensMatches.invert();
-        // The (row) index of the least right value of an nm1-generating pair so far in each column
-        Map<Integer, Integer> idxLeastRightValueInCols = new HashMap<>();
+        List<Index> out = new ArrayList<>();
         for (int y = 0; y < n; y++) { // men
-            final int[] row = malePrefs[y];
-            int idxLeastLeftValueInRow = -1;
-            for (int x = 0; x < n; x++) // women
-                if ((idxLeastLeftValueInRow == -1 || row[idxLeastLeftValueInRow] > row[x]) && isUnstablePair(mensMatches, womensMatches, y, x))
-                    idxLeastLeftValueInRow = row[x];
-            if (idxLeastLeftValueInRow != -1) {
-                int y2 = idxLeastRightValueInCols.getOrDefault(idxLeastLeftValueInRow, -1);
-                if (y2 == -1 || femalePrefs[idxLeastLeftValueInRow][y] < femalePrefs[idxLeastLeftValueInRow][y2])
-                    idxLeastRightValueInCols.put(idxLeastLeftValueInRow, y);
+            int matchedWoman = womensMatches.get(y);
+            for (int x = 0; x < n; x++) { // women
+                int matchedMan = mensMatches.get(x);
+                // Do y and x prefer to cheat with each other
+                if (malePrefs[y][x] < malePrefs[y][matchedWoman] && femalePrefs[x][y] < femalePrefs[x][matchedMan])
+                    out.add(new Index(y, x));
             }
         }
-        List<Index> out = new ArrayList<>();
-        for (var e : idxLeastRightValueInCols.entrySet())
-            out.add(new Index(e.getValue(), e.getKey()));
         return out;
     }
 
