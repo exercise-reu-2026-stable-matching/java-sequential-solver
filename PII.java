@@ -122,7 +122,7 @@ class PII {
         return out;
     }
 
-    /** Return a map from an nm1-pair to its corresponding nm2-generating pair */
+    /** Return a map from an nm1-pair to its corresponding nm2-generating pair. I think this map is injective (TODO?) */
     Map<Index, Index> nm2GeneratingPairs(Permutation mensMatches) {
         List<Index> nm1Pairs = nm1Pairs(mensMatches);
         Map<Index, Index> out = new HashMap<>();
@@ -134,6 +134,42 @@ class PII {
             int l = womensMatches.get(j);
             out.put(pair, new Index(l, k));
         }
+        return out;
+    }
+
+    static <K, V> Map<V, K> invertMap(Map<K, V> map) {
+        Map<V, K> out = new HashMap<>();
+        for (var e : map.entrySet()) {
+            if (out.containsKey(e.getValue()))
+                throw new RuntimeException("Duplicate in `invertMap`");
+            out.put(e.getValue(), e.getKey());
+        }
+        return out;
+    }
+
+    /** Return a length-`n` array where the value at index `i` represents all the 
+     * nm2-generating pairs `a_{l, k}` associated with matching pair `a_{i, k}`. */
+    List<Index>[] nm2GeneratingPairsAssociatedWithMatchingPair(Permutation mensMatches) {
+        List<Index>[] out = new List[n];
+        for (int i = 0; i < n; i++)
+            out[i] = new ArrayList<>();
+        
+        Map<Index, Index> nm2GeneratingPairs = nm2GeneratingPairs(mensMatches);
+        for (var e : nm2GeneratingPairs.entrySet()) {
+            Index nm1Pair = e.getKey(); // a_{i, j}
+            Index nm2GeneratingPair = e.getValue(); // a_{l, k}
+            int i = nm1Pair.y();
+            int j = nm1Pair.x();
+            int l = nm2GeneratingPair.y();
+            int k = nm2GeneratingPair.x();
+
+            assert mensMatches.get(i) == k;
+            assert mensMatches.get(l) == j;
+
+            out[i].add(nm2GeneratingPair);
+            out[l].add(nm2GeneratingPair); // TODO won't this cause duplicates? Is that ok?
+        }
+
         return out;
     }
 
