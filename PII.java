@@ -74,13 +74,14 @@ class PII {
     }
 
     List<Index> nm1Pairs(Permutation mensMatches) {
-        // The least right value of an nm1-generating pair so far in each column
+        Permutation womensMatches = mensMatches.invert();
+        // The (row) index of the least right value of an nm1-generating pair so far in each column
         Map<Integer, Integer> idxLeastRightValueInCols = new HashMap<>();
         for (int y = 0; y < n; y++) { // men
             final int[] row = malePrefs[y];
             int idxLeastLeftValueInRow = -1;
             for (int x = 0; x < n; x++) // women
-                if (idxLeastLeftValueInRow == -1 || row[idxLeastLeftValueInRow] > row[x])
+                if ((idxLeastLeftValueInRow == -1 || row[idxLeastLeftValueInRow] > row[x]) && isUnstablePair(mensMatches, womensMatches, y, x))
                     idxLeastLeftValueInRow = row[x];
             if (idxLeastLeftValueInRow != -1) {
                 int y2 = idxLeastRightValueInCols.getOrDefault(idxLeastLeftValueInRow, -1);
