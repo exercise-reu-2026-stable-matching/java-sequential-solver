@@ -105,7 +105,23 @@ class PII {
         return out;
     }
 
+    List<Index> nm2GeneratingPairs(Permutation mensMatches) {
+        List<Index> nm1Pairs = nm1Pairs(mensMatches);
+        List<Index> out = new ArrayList<>();
+        Permutation womensMatches = mensMatches.invert();
+        for (Index pair : nm1Pairs) {
+            int i = pair.y();
+            int j = pair.x();
+            int k = mensMatches.get(i);
+            int l = womensMatches.get(j);
+            out.add(new Index(l, k)); // TODO is this correct
+        }
+        return out;
+    }
+
     Permutation iterationPhase(Permutation mensMatches) {
         throw new RuntimeException("Not implemented yet"); // TODO
     }
+
+
 }
