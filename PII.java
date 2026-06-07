@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Arrays;
 
 class PII {
     /** 
@@ -294,10 +295,43 @@ class PII {
         return out;
     }
 
+    Set<Index> nmPairs(Permutation mensMatches) {
+        List<Index> nm1Pairs = nm1Pairs(mensMatches);
+        Set<Index> nm2Pairs = nm2Pairs(mensMatches);
+        
+        boolean[] inRow = new boolean[n];
+        boolean[] inCol = new boolean[n];
+        for (Index i : nm1Pairs) { 
+            // should be disjoint
+            assert !nm2Pairs.contains(i);
+            
+            // each row/column contains at most one pair
+            assert !inRow[i.y()];
+            assert !inCol[i.x()];
+            inRow[i.y()] = true;
+            inCol[i.x()] = true;
+        }
+        
+        nm2Pairs.addAll(nm1Pairs);
+        return nm2Pairs;
+    }
+
     Permutation iterationPhase(Permutation mensMatches) {
         checkPermLength(mensMatches);
 
-        throw new RuntimeException("Not implemented yet"); // TODO
+        int[] perm = new int[n];
+        Arrays.fill(perm, -1);
+        for (Index nmPair : nmPairs(mensMatches))
+            perm[nmPair.y()] = nmPair.x();
+        for (int y = 0; y < n; y++)
+            if (perm[y] == -1)
+                perm[y] = mensMatches.get(y); // the original
+
+        // check still injective
+        for (int y1 = 0; y1 < n; y1++) for (int y2 = 0; y2 < n; y2++)
+            assert !(y1 != y2 && perm[y1] == perm[y2]);
+
+        return new Permutation(perm);
     }
 
     // Initial matching in the example from the slides
@@ -386,6 +420,9 @@ class PII {
         for (Index nm2Pair : nm2Pairs)
             System.out.print(nm2Pair + " ");
         System.out.println();
+
+        Permutation nextMensMatches = pii.iterationPhase(mensMatches);
+        System.out.println("iterationPhase mensMatches: " + nextMensMatches);
     }
 
 }
