@@ -94,8 +94,7 @@ class PII {
         return out;
     }
 
-    /* The `int[]`s are maps from men to women */
-    int[] iterationPhase(Permutation mensMatches) {
+    Permutation iterationPhase(Permutation mensMatches) {
         throw new RuntimeException("Not implemented yet"); // TODO
     }
 }
