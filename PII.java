@@ -205,30 +205,98 @@ class PII {
         return out;
     }
 
-    /** Return the next and previous nm2-generating pairs of a given pair in the nm2-generating graph G_M.
+    /** Both fields can be `null` */
+    static class Edges {
+        Index rPtr, cPtr;
+
+        @Override
+        public String toString() {
+            return "(" + rPtr + ", " + cPtr + ")";
+        }
+    }
+
+    /** Return the row-pointer and col-pointer of nm2-generating pairs of a given pair in the nm2-generating graph G_M.
      * The degree of each vertex is at most two.
+     * The row-pointer is the nm2-generating pair found by traveling *horizontally* from the current nm2-generating pair 
+     * to the matching pair associated with both vertices, then traveling vertically.
+     * The col-pointer is defined similarly but with the order switched.
+     * Singleton nodes are still present in the keys of the returned map. Values are never null (but the fields may be)
      */
-    // Use sets so that two couples cheating on each other with each other don't have duplicate edges
-    Map<Index, Set<Index>> nm2GeneratingGraph(Permutation mensMatches) {
-        Map<Index, Set<Index>> out = new HashMap<>();
-        Set<Index>[] nm2GeneratingPairsAssociatedWithMatchingPairs = nm2GeneratingPairsAssociatedWithMatchingPair(mensMatches);
+    Map<Index, Edges> nm2GeneratingGraph(Permutation mensMatches) {
+        checkPermLength(mensMatches);
+
+        Map<Index, Edges> out = new HashMap<>();
+        IndexForMatchingPair[] nm2GeneratingPairsAssociatedWithMatchingPairs = nm2GeneratingPairsAssociatedWithMatchingPair(mensMatches);
         for (int y = 0; y < n; y++) { // men
-            Index[] nm2GeneratingPairs = nm2GeneratingPairsAssociatedWithMatchingPairs[y].toArray(new Index[0]);
-            assert nm2GeneratingPairs.length <= 2;
-            for (Index u : nm2GeneratingPairs) // Make sure even singleton chains have a key in `out`
-                out.putIfAbsent(u, new HashSet<>());
-            if (nm2GeneratingPairs.length == 2) {
-                // u and v have a common matching pair `(y, mensMatches.get(y))`
-                Index u = nm2GeneratingPairs[0];
-                Index v = nm2GeneratingPairs[1];
-                out.get(u).add(v);
-                out.get(v).add(u);
+            IndexForMatchingPair nm2GeneratingPairs = nm2GeneratingPairsAssociatedWithMatchingPairs[y];
+            Index inCol = nm2GeneratingPairs.inCol;
+            Index inRow = nm2GeneratingPairs.inRow;
+            if (inRow != null) out.putIfAbsent(inRow, new Edges());
+            if (inCol != null) out.putIfAbsent(inCol, new Edges());
+            if (inRow != null && inCol != null) {
+                // node in common
+                out.get(inRow).rPtr = inCol;
+                out.get(inCol).cPtr = inRow;
             }
         }
         return out;
     }
 
+    /** Returns the nm2-pair from the row end and column end of a chain; otherwise `null` for cycles */
+    Index nm2PairFromChain(Permutation mensMatches, Index start) {
+        Map<Index, Edges> edges = nm2GeneratingGraph(mensMatches);
+
+        Index rEnd = null;
+        for (Index curr = start; ; ) {
+            Index next = edges.get(curr).rPtr;
+            if (next == null) {
+                // we have found the r-end
+                rEnd = curr;
+                break;
+            } else if (next.equals(start))
+                // cycle
+                return null;
+            else
+                // keep going
+                curr = next;
+        }
+        Index cEnd = null;
+        for (Index curr = start; ; ) {
+            Index next = edges.get(curr).cPtr;
+            if (next == null) {
+                // reached col end
+                cEnd = curr;
+                break;
+            } else if (next.equals(start)) {
+                // cycle (shouldn't ever happen but whatever)
+                assert false; // unreachable
+                return null;
+            } else { 
+                // continue
+                curr = next;
+            }
+        }
+        assert rEnd != null;
+        assert cEnd != null;
+        return new Index(rEnd.y(), cEnd.x());
+    }
+
+    Set<Index> nm2Pairs(Permutation mensMatches) {
+        Map<Index, Edges> nm2GeneratingGraph = nm2GeneratingGraph(mensMatches);
+        Set<Index> out = new HashSet<>();
+
+        // This does a ton of extra work TODO
+        for (Index nm2GeneratingPair : nm2GeneratingGraph.keySet()) {
+            Index nm2Pair = nm2PairFromChain(mensMatches, nm2GeneratingPair);
+            if (nm2Pair != null)
+                out.add(nm2Pair);
+        }
+        return out;
+    }
+
     Permutation iterationPhase(Permutation mensMatches) {
+        checkPermLength(mensMatches);
+
         throw new RuntimeException("Not implemented yet"); // TODO
     }
 
@@ -307,11 +375,17 @@ class PII {
             System.out.print(i + ": " + nm2GeneratingPairsAssociatedWithMatchingPairs[i] + ", ");
         System.out.println();
 
-        // Map<Index, Node> nm2GeneratingGraph = pii.nm2GeneratingGraph(mensMatches);
-        // System.out.print("nm2-generating graph: ");
-        // for (var e : nm2GeneratingGraph.entrySet())
-        //     System.out.print(e.getKey() + ": " + e.getValue() + " ");
-        // System.out.println();
+        Map<Index, Edges> nm2GeneratingGraph = pii.nm2GeneratingGraph(mensMatches);
+        System.out.print("nm2-generating graph: ");
+        for (var e : nm2GeneratingGraph.entrySet())
+            System.out.print(e.getKey() + ": " + e.getValue() + " ");
+        System.out.println();
+
+        Set<Index> nm2Pairs = pii.nm2Pairs(mensMatches);
+        System.out.print("nm2-pairs: ");
+        for (Index nm2Pair : nm2Pairs)
+            System.out.print(nm2Pair + " ");
+        System.out.println();
     }
 
 }
