@@ -92,7 +92,7 @@ class PII {
 
     List<Index> nm1Pairs(Permutation mensMatches) {
         List<Index> nm1GeneratingPairs = nm1GeneratingPairs(mensMatches);
-        // TODO this is pretty inefficient but it's easy to understand
+        // this is pretty inefficient but it's easy to understand
         Map<Integer, Integer> generatingRowsOfCols = new HashMap<>();
         for (Index i : nm1GeneratingPairs) {
             int y2 = generatingRowsOfCols.getOrDefault(i.x(), -1);
