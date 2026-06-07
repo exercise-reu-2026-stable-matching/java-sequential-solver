@@ -195,17 +195,17 @@ class PII {
             int l = nm2GeneratingPair.y();
             int k = nm2GeneratingPair.x();
 
-            assert mensMatches.get(i) == k;
-            assert mensMatches.get(l) == j;
+            assert mensMatches.get(i) == k; // a_{i, k} is a matching pair
+            assert mensMatches.get(l) == j; // a_{l, j} is a matching pair
 
-            out[i].inRow = nm2GeneratingPair;
-            out[l].inCol = nm2GeneratingPair;
+            out[i].inCol = nm2GeneratingPair;
+            out[l].inRow = nm2GeneratingPair;
         }
 
         return out;
     }
 
-    /** Return an adjacency list for each nm2-generating pair in the nm2-generating graph G_M.
+    /** Return the next and previous nm2-generating pairs of a given pair in the nm2-generating graph G_M.
      * The degree of each vertex is at most two.
      */
     // Use sets so that two couples cheating on each other with each other don't have duplicate edges
