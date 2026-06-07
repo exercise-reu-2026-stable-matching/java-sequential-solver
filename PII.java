@@ -77,7 +77,12 @@ class PII {
     }
 
     /** 2D index into an `n` x `n` array */
-    static record Index(int y, int x) {}
+    static record Index(int y, int x) {
+        @Override 
+        public String toString() {
+            return "(" + y + ", " + x + ")";
+        }
+    }
 
     boolean isUnstable(Permutation mensMatches, Permutation womensMatches, int y, int x) {
         int matchedWoman = womensMatches.get(y);
