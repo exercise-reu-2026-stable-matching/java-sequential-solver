@@ -1,6 +1,8 @@
 import java.util.Random;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 class PII {
     /** 
@@ -65,18 +67,41 @@ class PII {
     /** 2D index into an `n` x `n` array */
     static record Index(int y, int x) {}
 
-    List<Index> unstablePairs(Permutation mensMatches) {
+    boolean isUnstable(Permutation mensMatches, Permutation womensMatches, int y, int x) {
+        int matchedWoman = womensMatches.get(y);
+        int matchedMan = mensMatches.get(x);
+        // Do y and x prefer to cheat with each other
+        return (malePrefs[y][x] < malePrefs[y][matchedWoman] && femalePrefs[x][y] < femalePrefs[x][matchedMan]);
+    }
+
+    List<Index> nm1GeneratingPairs(Permutation mensMatches) {
         Permutation womensMatches = mensMatches.invert();
         List<Index> out = new ArrayList<>();
         for (int y = 0; y < n; y++) { // men
-            int matchedWoman = womensMatches.get(y);
+            final int[] row = malePrefs[y];
+            int idxOfMinLeftValue = -1;
             for (int x = 0; x < n; x++) { // women
-                int matchedMan = mensMatches.get(x);
-                // Do y and x prefer to cheat with each other
-                if (malePrefs[y][x] < malePrefs[y][matchedWoman] && femalePrefs[x][y] < femalePrefs[x][matchedMan])
-                    out.add(new Index(y, x));
+                if (isUnstable(mensMatches, womensMatches, y, x) && (idxOfMinLeftValue == -1 || row[x] < row[idxOfMinLeftValue]))
+                    idxOfMinLeftValue = x;
             }
+            if (idxOfMinLeftValue != -1)
+                out.add(new Index(y, idxOfMinLeftValue));
         }
+        return out;
+    }
+
+    List<Index> nm1Pairs(Permutation mensMatches) {
+        List<Index> nm1GeneratingPairs = nm1GeneratingPairs(mensMatches);
+        // TODO this is pretty inefficient but it's easy to understand
+        Map<Integer, Integer> generatingRowsOfCols = new HashMap<>();
+        for (Index i : nm1GeneratingPairs) {
+            int y2 = generatingRowsOfCols.getOrDefault(i.x(), -1);
+            if (y2 == -1 || femalePrefs[i.x()][i.y()] < femalePrefs[i.x()][y2])
+                generatingRowsOfCols.put(i.x(), i.y());
+        }
+        List<Index> out = new ArrayList<>();
+        for (var e : generatingRowsOfCols.entrySet())
+            out.add(new Index(e.getValue(), e.getKey()));
         return out;
     }
 
