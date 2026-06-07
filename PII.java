@@ -140,5 +140,46 @@ class PII {
         throw new RuntimeException("Not implemented yet"); // TODO
     }
 
+    public static void main(String[] args) {
+        int[][] malePrefs = {
+            { 4, 2, 3, 1 },
+            { 3, 1, 2, 4 },
+            { 2, 4, 1, 3 },
+            { 1, 4, 3, 2 }
+        };
+        int[][] femalePrefs = {
+            { 1, 4, 2, 3 },
+            { 1, 2, 3, 4 },
+            { 4, 2, 3, 1 },
+            { 3, 1, 4, 2 }
+        };
+        PII pii = new PII(malePrefs, femalePrefs);
+        
+        // Random rng = new Random(5);
+        // Permutation mensMatches = pii.initiationPhase(rng);
+
+        // Initial matching in the example from the slides
+        Permutation mensMatches = new Permutation(new int[]{ 0, 3, 2, 1 });
+        System.out.println("initiationPhase mensMatches: " + mensMatches);
+        
+        List<Index> nm1GeneratingPairs = pii.nm1GeneratingPairs(mensMatches);
+        System.out.print("nm1 generating pairs: ");
+        for (Index index : nm1GeneratingPairs)
+            System.out.print(index + " ");
+        System.out.println();
+
+        List<Index> nm1Pairs = pii.nm1Pairs(mensMatches);
+        System.out.print("nm1 pairs: ");
+        for (Index index : nm1Pairs)
+            System.out.print(index + " ");
+        System.out.println();
+
+        List<Index> nm2GeneratingPairs = pii.nm2GeneratingPairs(mensMatches);
+        System.out.print("nm2 generating pairs: ");
+        for (Index index : nm2GeneratingPairs)
+            System.out.print(index + " ");
+        System.out.println();
+    }
+
 
 }
