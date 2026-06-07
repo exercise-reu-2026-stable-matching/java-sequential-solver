@@ -58,6 +58,18 @@ class PII {
             }
             return new Permutation(out);
         }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder("{");
+            for (int i = 0; i < size(); i++) {
+                sb.append(i + ": " + perm[i]);
+                if (i != size() - 1)
+                    sb.append(", ");
+            }
+            sb.append("}");
+            return sb.toString();
+        }
     }
 
     Permutation initiationPhase(Random rng) {
