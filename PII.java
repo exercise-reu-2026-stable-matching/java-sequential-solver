@@ -151,7 +151,7 @@ class PII {
 
     /** Return a length-`n` array where the value at index `i` represents all the 
      * nm2-generating pairs `a_{l, k}` associated with matching pair `a_{i, k}`. */
-    List<Index>[] nm2GeneratingPairsAssociatedWithMatchingPair(Permutation mensMatches) {
+    Set<Index>[] nm2GeneratingPairsAssociatedWithMatchingPair(Permutation mensMatches) {
         Set<Index>[] out = new Set[n];
         for (int i = 0; i < n; i++)
             out[i] = new HashSet<>();
@@ -172,10 +172,7 @@ class PII {
             out[l].add(nm2GeneratingPair);
         }
 
-        List<Index>[] outLists = new List[n];
-        for (int i = 0; i < n; i++)
-            outLists[i] = List.copyOf(out[i]); // TODO maybe we don't need to deduplicate like this
-        return outLists;
+        return out; // TODO maybe this can be a list, idk about duplication though
     }
 
     Permutation iterationPhase(Permutation mensMatches) {
@@ -250,7 +247,7 @@ class PII {
             System.out.print(e.getKey() + ": " + e.getValue() + " ");
         System.out.println();
 
-        List<Index>[] nm2GeneratingPairsAssociatedWithMatchingPairs = 
+        Set<Index>[] nm2GeneratingPairsAssociatedWithMatchingPairs = 
             pii.nm2GeneratingPairsAssociatedWithMatchingPair(mensMatches);
         System.out.print("matching pairs to associated nm2 generating pairs: ");
         for (int i = 0; i < pii.n; i++)
