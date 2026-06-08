@@ -1,10 +1,14 @@
 import java.util.Random;
 
 class Permutation {
-    private int[] perm;
+    private final int[] perm;
+    private final int[] inversePerm;
     
-    Permutation(int[] fn) {
-        this.perm = fn;
+    Permutation(int[] perm) {
+        this.perm = perm;
+        this.inversePerm = new int[perm.length];
+        for (int i = 0; i < perm.length; i++)
+            inversePerm[perm[i]] = i;
     }
     
     int size() {
@@ -15,11 +19,8 @@ class Permutation {
         return perm[index];
     }
 
-    Permutation invert() {
-        int[] out = new int[size()];
-        for (int i = 0; i < out.length; i++)
-            out[perm[i]] = i;
-        return new Permutation(out);
+    int getInverse(int index) {
+        return inversePerm[index];
     }
 
     static Permutation random(Random rng, int n) {

@@ -23,8 +23,8 @@ abstract class PIIBase {
         return Permutation.random(rng, n);
     }
 
-    final boolean isUnstable(Permutation mensMatches, Permutation womensMatches, int y, int x) {
-        int matchedWoman = womensMatches.get(y);
+    final boolean isUnstable(Permutation mensMatches, int y, int x) {
+        int matchedWoman = mensMatches.getInverse(y);
         int matchedMan = mensMatches.get(x);
         // Do y and x prefer to cheat with each other
         return (malePrefs[y][x] < malePrefs[y][matchedWoman] && femalePrefs[x][y] < femalePrefs[x][matchedMan]);
@@ -36,10 +36,9 @@ abstract class PIIBase {
     }
 
     final boolean isStableMatching(Permutation mensMatches) {
-        Permutation womensMatches = mensMatches.invert();
         for (int y = 0; y < n; y++) 
             for (int x = 0; x < n; x++)
-                if (isUnstable(mensMatches, womensMatches, y, x))
+                if (isUnstable(mensMatches, y, x))
                     return false;
         return true;
     }

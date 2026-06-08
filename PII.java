@@ -14,13 +14,12 @@ class PII extends PIIBase {
     List<Index> nm1GeneratingPairs(Permutation mensMatches) {
         checkPermLength(mensMatches);
 
-        Permutation womensMatches = mensMatches.invert();
         List<Index> out = new ArrayList<>();
         for (int y = 0; y < n; y++) { // men
             final int[] row = malePrefs[y];
             int idxOfMinLeftValue = -1;
             for (int x = 0; x < n; x++) { // women
-                if (isUnstable(mensMatches, womensMatches, y, x) && (idxOfMinLeftValue == -1 || row[x] < row[idxOfMinLeftValue]))
+                if (isUnstable(mensMatches, y, x) && (idxOfMinLeftValue == -1 || row[x] < row[idxOfMinLeftValue]))
                     idxOfMinLeftValue = x;
             }
             if (idxOfMinLeftValue != -1)
@@ -52,12 +51,11 @@ class PII extends PIIBase {
 
         List<Index> nm1Pairs = nm1Pairs(mensMatches);
         Map<Index, Index> out = new HashMap<>();
-        Permutation womensMatches = mensMatches.invert();
         for (Index pair : nm1Pairs) {
             int i = pair.y();
             int j = pair.x();
             int k = mensMatches.get(i);
-            int l = womensMatches.get(j);
+            int l = mensMatches.getInverse(j); // woman -> man
             out.put(pair, new Index(l, k));
         }
         return out;
