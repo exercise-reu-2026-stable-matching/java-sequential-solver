@@ -7,7 +7,7 @@ interface PIIBase {
 
     // TODO maybe extract some of these to helper functions
 
-    static boolean isUnstable(Permutation mensMatches, Prefs prefs, int y, int x) {
+    static boolean isUnstablePair(Permutation mensMatches, Prefs prefs, int y, int x) {
         int matchedWoman = mensMatches.getInverse(y);
         int matchedMan = mensMatches.get(x);
         // Do y and x prefer to cheat with each other
@@ -23,7 +23,7 @@ interface PIIBase {
     static boolean isStableMatching(Permutation mensMatches, Prefs prefs) {
         for (int y = 0; y < prefs.n(); y++) 
             for (int x = 0; x < prefs.n(); x++)
-                if (isUnstable(mensMatches, prefs, y, x))
+                if (isUnstablePair(mensMatches, prefs, y, x))
                     return false;
         return true;
     }

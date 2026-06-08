@@ -21,7 +21,7 @@ class PII implements PIIBase {
             final int[] row = prefs.malePrefs()[y];
             int idxOfMinLeftValue = -1;
             for (int x = 0; x < prefs.n(); x++) { // women
-                if (PIIBase.isUnstable(mensMatches, prefs, y, x) && (idxOfMinLeftValue == -1 || row[x] < row[idxOfMinLeftValue]))
+                if (PIIBase.isUnstablePair(mensMatches, prefs, y, x) && (idxOfMinLeftValue == -1 || row[x] < row[idxOfMinLeftValue]))
                     idxOfMinLeftValue = x;
             }
             if (idxOfMinLeftValue != -1)
