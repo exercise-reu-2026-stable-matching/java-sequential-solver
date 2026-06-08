@@ -58,4 +58,13 @@ abstract class PIIBase {
         }
         return new Pair<>(curr, isStableMatching(curr));
     }
+
+    /** Keep running `runOne` until a stable matching is found */
+    final Permutation run(int c, Random rng) {
+        Pair<Permutation, Boolean> res;
+        do {
+            res = runOne(c, rng);
+        } while (!res.snd());
+        return res.fst();
+    }
 }
