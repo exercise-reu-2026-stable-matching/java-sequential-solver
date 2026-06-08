@@ -151,16 +151,6 @@ class PII {
         return out;
     }
 
-    static <K, V> Map<V, K> invertMap(Map<K, V> map) {
-        Map<V, K> out = new HashMap<>();
-        for (var e : map.entrySet()) {
-            if (out.containsKey(e.getValue()))
-                throw new RuntimeException("Duplicate in `invertMap`");
-            out.put(e.getValue(), e.getKey());
-        }
-        return out;
-    }
-
     // For some matching pair (not in this class), two points that each share the row and column of the matching pair, respectively
     static class IndexForMatchingPair {
         Index inRow, inCol;
