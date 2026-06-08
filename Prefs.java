@@ -54,8 +54,8 @@ record Prefs(int[][] malePrefs, int[][] femalePrefs) {
         return malePrefs[man][woman];
     }
 
-    public int femalePrefs(int man, int woman) {
-        return femalePrefs[man][woman];
+    public int femalePrefs(int woman, int man) {
+        return femalePrefs[woman][man];
     }
 
     int n() {
