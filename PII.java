@@ -47,7 +47,7 @@ class PII extends PIIBase {
         return out;
     }
 
-    /** Return a map from an nm1-pair to its corresponding nm2-generating pair. I think this map is injective (TODO?) */
+    /** Return a map from an nm1-pair to its corresponding nm2-generating pair. This map is injective */
     Map<Index, Index> nm2GeneratingPairs(Permutation mensMatches) {
         PIIBase.checkPermLength(mensMatches, prefs);
 
@@ -60,6 +60,15 @@ class PII extends PIIBase {
             int l = mensMatches.getInverse(j); // woman -> man
             out.put(pair, new Index(l, k));
         }
+
+        // Check injectivity
+        Map<Index, Index> rev = new HashMap<>();
+        for (Index k : out.keySet()) {
+            Index v = out.get(k);
+            assert !rev.containsKey(v) : "Duplicate value " + v;
+            rev.put(v, k);
+        }
+            
         return out;
     }
 
