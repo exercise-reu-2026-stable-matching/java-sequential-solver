@@ -35,5 +35,14 @@ abstract class PIIBase {
             throw new RuntimeException("Wrong size for permutation");
     }
 
+    final boolean isStableMatching(Permutation mensMatches) {
+        Permutation womensMatches = mensMatches.invert();
+        for (int y = 0; y < n; y++) 
+            for (int x = 0; x < n; x++)
+                if (isUnstable(mensMatches, womensMatches, y, x))
+                    return false;
+        return true;
+    }
+
     abstract Permutation iterationPhase(Permutation mensMatches);
 }
