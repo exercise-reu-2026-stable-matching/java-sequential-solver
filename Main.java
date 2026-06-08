@@ -4,7 +4,7 @@ import java.util.Set;
 
 class Main {
     // Initial matching in the example from the slides
-    static final PII slidesExample;
+    static final Pair<Prefs, Permutation> slidesExample;
     static {
         int[][] malePrefs = {
             { 4, 2, 3, 1 },
@@ -18,11 +18,13 @@ class Main {
             { 4, 2, 3, 1 },
             { 3, 1, 4, 2 }
         };
-        slidesExample = new PII(new Prefs(malePrefs, femalePrefs));
+        slidesExample = new Pair<>(
+            new Prefs(malePrefs, femalePrefs),
+            new Permutation(new int[]{ 0, 3, 2, 1 }));
     }
 
     // Jeffrey's example that we worked out together
-    static final PII jeffreyExample;
+    static final Pair<Prefs, Permutation> jeffreyExample;
     static {
         int[][] malePrefs = {
             { 3, 4, 5, 1, 6, 2 },
@@ -40,11 +42,13 @@ class Main {
             { 6, 5, 4, 2, 3, 1 },
             { 3, 5, 1, 6, 2, 4 }
         };
-        jeffreyExample = new PII(new Prefs(malePrefs, femalePrefs));
+        jeffreyExample = new Pair<>(
+            new Prefs(malePrefs, femalePrefs),
+            Permutation.identity(6));
     }
 
     // Matthew's example
-    static final PII matthewExample;
+    static final Pair<Prefs, Permutation> matthewExample;
     static {
         int[][] malePrefs = {
             {  2,  4, 10,  9,  5,  3,  8,  6,  1,  7 },
@@ -70,18 +74,18 @@ class Main {
             {  3,  2,  6,  5,  4,  1,  8,  7,  9, 10 },
             {  8,  1,  4,  3,  9,  2,  7, 10,  6,  5 }
         };
-        matthewExample = new PII(new Prefs(malePrefs, femalePrefs));
+        matthewExample = new Pair<>(
+            new Prefs(malePrefs, femalePrefs),
+            new Permutation(new int[]{ 1, 7, 3, 0, 5, 6, 9, 8, 4, 2 }));
     }
 
     public static void main(String[] args) {
-        PII pii = matthewExample;
+        Pair<Prefs, Permutation> example = matthewExample;
+        PII pii = new PII(example.fst());
+        Permutation mensMatches = example.snd();
 
         // Random rng = new Random(5);
         // Permutation mensMatches = pii.initiationPhase(rng);
-
-        // Permutation mensMatches = new Permutation(new int[]{ 0, 3, 2, 1 });
-        // Permutation mensMatches = Permutation.identity(6);
-        Permutation mensMatches = new Permutation(new int[]{ 1, 7, 3, 0, 5, 6, 9, 8, 4, 2 });
         System.out.println("initiationPhase mensMatches: " + mensMatches);
         
         List<Index> nm1GeneratingPairs = pii.nm1GeneratingPairs(mensMatches);
