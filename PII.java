@@ -6,20 +6,22 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Arrays;
 
-class PII extends PIIBase {
-    PII(int[][] malePrefs, int[][] femalePrefs) {
-        super(malePrefs, femalePrefs);
+class PII implements PIIBase {
+    final Prefs prefs;
+
+    PII(Prefs prefs) {
+        this.prefs = prefs;
     }
 
     List<Index> nm1GeneratingPairs(Permutation mensMatches) {
-        checkPermLength(mensMatches);
+        PIIBase.checkPermLength(mensMatches, prefs);
 
         List<Index> out = new ArrayList<>();
-        for (int y = 0; y < n; y++) { // men
-            final int[] row = malePrefs[y];
+        for (int y = 0; y < prefs.n(); y++) { // men
+            final int[] row = prefs.malePrefs()[y];
             int idxOfMinLeftValue = -1;
-            for (int x = 0; x < n; x++) { // women
-                if (isUnstable(mensMatches, y, x) && (idxOfMinLeftValue == -1 || row[x] < row[idxOfMinLeftValue]))
+            for (int x = 0; x < prefs.n(); x++) { // women
+                if (PIIBase.isUnstable(mensMatches, prefs, y, x) && (idxOfMinLeftValue == -1 || row[x] < row[idxOfMinLeftValue]))
                     idxOfMinLeftValue = x;
             }
             if (idxOfMinLeftValue != -1)
@@ -29,14 +31,14 @@ class PII extends PIIBase {
     }
 
     List<Index> nm1Pairs(Permutation mensMatches) {
-        checkPermLength(mensMatches);
+        PIIBase.checkPermLength(mensMatches, prefs);
 
         List<Index> nm1GeneratingPairs = nm1GeneratingPairs(mensMatches);
         // this is pretty inefficient but it's easy to understand
         Map<Integer, Integer> generatingRowsOfCols = new HashMap<>();
         for (Index i : nm1GeneratingPairs) {
             int y2 = generatingRowsOfCols.getOrDefault(i.x(), -1);
-            if (y2 == -1 || femalePrefs[i.x()][i.y()] < femalePrefs[i.x()][y2])
+            if (y2 == -1 || prefs.femalePrefs(i.x(), i.y()) < prefs.femalePrefs(i.x(), y2))
                 generatingRowsOfCols.put(i.x(), i.y());
         }
         List<Index> out = new ArrayList<>();
@@ -47,7 +49,7 @@ class PII extends PIIBase {
 
     /** Return a map from an nm1-pair to its corresponding nm2-generating pair. I think this map is injective (TODO?) */
     Map<Index, Index> nm2GeneratingPairs(Permutation mensMatches) {
-        checkPermLength(mensMatches);
+        PIIBase.checkPermLength(mensMatches, prefs);
 
         List<Index> nm1Pairs = nm1Pairs(mensMatches);
         Map<Index, Index> out = new HashMap<>();
@@ -81,10 +83,10 @@ class PII extends PIIBase {
     // where `i` is the man matched with woman `k` and `j` is the woman matched with man `l`.
     // We put `a_{l, k}` at both indices `i` and `l` (the men).
     IndexForMatchingPair[] nm2GeneratingPairsAssociatedWithMatchingPair(Permutation mensMatches) {
-        checkPermLength(mensMatches);
+        PIIBase.checkPermLength(mensMatches, prefs);
 
-        IndexForMatchingPair[] out = new IndexForMatchingPair[n];
-        for (int i = 0; i < n; i++)
+        IndexForMatchingPair[] out = new IndexForMatchingPair[prefs.n()];
+        for (int i = 0; i < prefs.n(); i++)
             out[i] = new IndexForMatchingPair();
         
         Map<Index, Index> nm2GeneratingPairs = nm2GeneratingPairs(mensMatches);
@@ -124,11 +126,11 @@ class PII extends PIIBase {
      * Singleton nodes are still present in the keys of the returned map. Values are never null (but the fields may be)
      */
     Map<Index, Edges> nm2GeneratingGraph(Permutation mensMatches) {
-        checkPermLength(mensMatches);
+        PIIBase.checkPermLength(mensMatches, prefs);
 
         Map<Index, Edges> out = new HashMap<>();
         IndexForMatchingPair[] nm2GeneratingPairsAssociatedWithMatchingPairs = nm2GeneratingPairsAssociatedWithMatchingPair(mensMatches);
-        for (int y = 0; y < n; y++) { // men
+        for (int y = 0; y < prefs.n(); y++) { // men
             IndexForMatchingPair nm2GeneratingPairs = nm2GeneratingPairsAssociatedWithMatchingPairs[y];
             Index inCol = nm2GeneratingPairs.inCol;
             Index inRow = nm2GeneratingPairs.inRow;
@@ -199,8 +201,8 @@ class PII extends PIIBase {
         List<Index> nm1Pairs = nm1Pairs(mensMatches);
         Set<Index> nm2Pairs = nm2Pairs(mensMatches);
         
-        boolean[] inRow = new boolean[n];
-        boolean[] inCol = new boolean[n];
+        boolean[] inRow = new boolean[prefs.n()];
+        boolean[] inCol = new boolean[prefs.n()];
         for (Index i : nm1Pairs) { 
             // should be disjoint
             assert !nm2Pairs.contains(i);
@@ -217,19 +219,19 @@ class PII extends PIIBase {
     }
 
     @Override
-    Permutation iterationPhase(Permutation mensMatches) {
-        checkPermLength(mensMatches);
+    public Permutation iterationPhase(Permutation mensMatches) {
+        PIIBase.checkPermLength(mensMatches, prefs);
 
-        int[] perm = new int[n];
+        int[] perm = new int[prefs.n()];
         Arrays.fill(perm, -1);
         for (Index nmPair : nmPairs(mensMatches))
             perm[nmPair.y()] = nmPair.x();
-        for (int y = 0; y < n; y++)
+        for (int y = 0; y < prefs.n(); y++)
             if (perm[y] == -1)
                 perm[y] = mensMatches.get(y); // the original
 
         // check still injective
-        for (int y1 = 0; y1 < n; y1++) for (int y2 = 0; y2 < n; y2++)
+        for (int y1 = 0; y1 < prefs.n(); y1++) for (int y2 = 0; y2 < prefs.n(); y2++)
             assert !(y1 != y2 && perm[y1] == perm[y2]);
 
         return new Permutation(perm);

@@ -18,7 +18,7 @@ class Main {
             { 4, 2, 3, 1 },
             { 3, 1, 4, 2 }
         };
-        slidesExample = new PII(malePrefs, femalePrefs);
+        slidesExample = new PII(new Prefs(malePrefs, femalePrefs));
     }
 
     // Jeffrey's example that we worked out together
@@ -40,7 +40,7 @@ class Main {
             { 6, 5, 4, 2, 3, 1 },
             { 3, 5, 1, 6, 2, 4 }
         };
-        jeffreyExample = new PII(malePrefs, femalePrefs);
+        jeffreyExample = new PII(new Prefs(malePrefs, femalePrefs));
     }
 
     public static void main(String[] args) {
@@ -74,7 +74,7 @@ class Main {
         PII.IndexForMatchingPair[] nm2GeneratingPairsAssociatedWithMatchingPairs = 
             pii.nm2GeneratingPairsAssociatedWithMatchingPair(mensMatches);
         System.out.print("matching pairs to associated nm2 generating pairs: ");
-        for (int i = 0; i < pii.n; i++)
+        for (int i = 0; i < pii.prefs.n(); i++)
             System.out.print(i + ": " + nm2GeneratingPairsAssociatedWithMatchingPairs[i] + ", ");
         System.out.println();
 
