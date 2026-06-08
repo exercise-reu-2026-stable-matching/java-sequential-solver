@@ -50,7 +50,7 @@ class Main {
         // Permutation mensMatches = pii.initiationPhase(rng);
 
         // Permutation mensMatches = new Permutation(new int[]{ 0, 3, 2, 1 });
-        Permutation mensMatches = new Permutation(new int[]{ 0, 1, 2, 3, 4, 5 });
+        Permutation mensMatches = Permutation.identity(6);
         System.out.println("initiationPhase mensMatches: " + mensMatches);
         
         List<Index> nm1GeneratingPairs = pii.nm1GeneratingPairs(mensMatches);

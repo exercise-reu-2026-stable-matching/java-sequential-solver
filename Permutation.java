@@ -47,4 +47,24 @@ class Permutation {
         sb.append("}");
         return sb.toString();
     }
+
+    /** The identity permutation on `n` elements */
+    static Permutation identity(int n) {
+        int[] out = new int[n];
+        for (int i = 0; i < n; i++)
+            out[i] = i + 1; // 1 indexed to be consistent with the written-out examples
+        return new Permutation(out);
+    }
+
+    /** Compose `this(other)`. Throws if the sizes don't match. */
+    Permutation compose(Permutation other) {
+        int n = size();
+        if (other.size() != n)
+            throw new RuntimeException("Sizes don't match in `Permutation.compose`");
+        
+        int[] out = new int[n];
+        for (int i = 0; i < n; i++)
+            out[i] = perm[other.perm[i]];
+        return new Permutation(out);
+    }
 }
