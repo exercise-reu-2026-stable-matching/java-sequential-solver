@@ -52,7 +52,7 @@ class Permutation {
     static Permutation identity(int n) {
         int[] out = new int[n];
         for (int i = 0; i < n; i++)
-            out[i] = i + 1; // 1 indexed to be consistent with the written-out examples
+            out[i] = i; // 0-indexed
         return new Permutation(out);
     }
 
