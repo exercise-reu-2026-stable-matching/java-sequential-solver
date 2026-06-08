@@ -1,7 +1,7 @@
 import java.util.Random;
 
 abstract class PIIBase {
-    Permutation initiationPhase(Prefs prefs, Random rng) {
+    static Permutation initiationPhase(Prefs prefs, Random rng) {
         return Permutation.random(rng, prefs.n());
     }
 
@@ -28,18 +28,26 @@ abstract class PIIBase {
         return true;
     }
 
+    final Pair<Permutation, Boolean> runOne(Prefs prefs, int c, Random rng) {
+        Permutation initial = initiationPhase(prefs, rng);
+        return runOne(prefs, c, initial);
+    }
+
     /** Do one `initiationPhase` and at most `c * n` `iterationPhase`s until a stable matching is reached.
      * Returns the output and whether it's a stable matching.
       */
-    final Pair<Permutation, Boolean> runOne(Prefs prefs, int c, Random rng) {
-        Permutation curr = initiationPhase(prefs, rng);
+    final Pair<Permutation, Boolean> runOne(Prefs prefs, int c, Permutation initial) {
+        Permutation curr = initial;
         for (int i = 0; i < c * prefs.n(); i++) {
+            System.out.println("curr: " + curr);
             if (isStableMatching(curr, prefs))
                 return new Pair<>(curr, true);
             curr = iterationPhase(curr);
         }
         return new Pair<>(curr, isStableMatching(curr, prefs));
     }
+
+    // TODO we shouldn't have to pass `prefs` in here again
 
     /** Keep running `runOne` until a stable matching is found */
     final Permutation run(Prefs prefs, int c, Random rng) {
