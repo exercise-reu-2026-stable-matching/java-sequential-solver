@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 record Prefs(int[][] malePrefs, int[][] femalePrefs) {
     // Checks if prefs are all permutations of [1..n]
     private static void checkPerm(int[] row, int n) {
@@ -8,12 +10,12 @@ record Prefs(int[][] malePrefs, int[][] femalePrefs) {
         boolean[] present = new boolean[n];
         for (int i = 0; i < n; i++) {
             if (present[row[i] - 1])
-                throw new RuntimeException("Duplicate");
+                throw new RuntimeException("Duplicate " + row[i] + " in row " + Arrays.toString(row));
             present[row[i] - 1] = true;
         }
         for (int i = 0; i < n; i++)
             if (!present[i])
-                throw new RuntimeException("Missing");
+                throw new RuntimeException("Missing " + i + " in row " + Arrays.toString(row));
     }
     
     Prefs(int[][] malePrefs, int[][] femalePrefs) {
