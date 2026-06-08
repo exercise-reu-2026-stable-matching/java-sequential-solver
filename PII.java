@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Arrays;
 
-class PII implements PIIBase {
+class PII extends PIIBase {
     final Prefs prefs;
 
     PII(Prefs prefs) {
