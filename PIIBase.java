@@ -39,9 +39,9 @@ abstract class PIIBase {
     final Pair<Permutation, Boolean> runOne(Prefs prefs, int c, Permutation initial) {
         Permutation curr = initial;
         for (int i = 0; i < c * prefs.n(); i++) {
-            System.out.println("curr: " + curr);
             if (isStableMatching(curr, prefs))
                 return new Pair<>(curr, true);
+            System.out.println("curr: " + curr);
             curr = iterationPhase(curr);
         }
         return new Pair<>(curr, isStableMatching(curr, prefs));
