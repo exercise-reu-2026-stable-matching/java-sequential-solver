@@ -7,9 +7,6 @@ abstract class PIIBase {
 
     abstract Permutation iterationPhase(Permutation mensMatches);
 
-
-
-    
     static boolean isUnstablePair(Permutation mensMatches, Prefs prefs, int y, int x) {
         int matchedWoman = mensMatches.getInverse(y);
         int matchedMan = mensMatches.get(x);
