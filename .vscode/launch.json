@@ -9,7 +9,8 @@
             "name": "Main",
             "request": "launch",
             "mainClass": "Main",
-            "projectName": "simple-solver-java_79ea23eb"
+            "projectName": "simple-solver-java_79ea23eb",
+            "vmArgs": "-ea"
         },
         {
             "type": "java",
