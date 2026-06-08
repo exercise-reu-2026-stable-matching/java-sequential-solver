@@ -45,4 +45,17 @@ abstract class PIIBase {
     }
 
     abstract Permutation iterationPhase(Permutation mensMatches);
+
+    /** Do one `initiationPhase` and at most `c * n` `iterationPhase`s until a stable matching is reached.
+     * Returns the output and whether it's a stable matching.
+      */
+    final Pair<Permutation, Boolean> runOne(int c, Random rng) {
+        Permutation curr = initiationPhase(rng);
+        for (int i = 0; i < c * n; i++) {
+            if (isStableMatching(curr))
+                return new Pair<>(curr, true);
+            curr = iterationPhase(curr);
+        }
+        return new Pair<>(curr, isStableMatching(curr));
+    }
 }

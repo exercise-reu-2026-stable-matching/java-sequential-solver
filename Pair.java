@@ -1,0 +1,1 @@
+record Pair<T, U>(T fst, U snd) {}
