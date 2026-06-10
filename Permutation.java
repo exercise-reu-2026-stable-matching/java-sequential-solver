@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Random;
 
 /** A permutation on [0, n) */
@@ -63,6 +64,16 @@ class Permutation {
         }
         sb.append("}");
         return sb.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(perm);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof Permutation other && Arrays.equals(perm, other.perm);
     }
 
     /** The identity permutation on `n` elements */

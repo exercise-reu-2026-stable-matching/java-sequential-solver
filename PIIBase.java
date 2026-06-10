@@ -1,3 +1,6 @@
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.Random;
 
 abstract class PIIBase {
@@ -51,6 +54,18 @@ abstract class PIIBase {
             curr = iterationPhase(curr);
         }
         return new Pair<>(curr, isStableMatching(curr));
+    }
+
+    final Optional<Permutation> runOrCycle(Permutation initial) {
+        Permutation curr = initial;
+        Set<Permutation> visited = new HashSet<>();
+
+        while (!isStableMatching(curr)) {
+            if (visited.contains(curr)) return Optional.empty();
+            visited.add(curr);
+            curr = iterationPhase(curr);
+        }
+        return Optional.of(curr);
     }
 
     /** Keep running `runOne` until a stable matching is found */

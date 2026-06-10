@@ -1,22 +1,23 @@
+import java.util.Optional;
 import java.util.Random;
 
 class Main {
     /** Find a (randomly-generated) `Prefs` of size `n` that causes
-     * `runOne` with `c` to not yield a stable matching. */
-    static Prefs findNonTerminating(Random rng, int n, int c) {
+     * `runOrCycle` to cycle. */
+    static Prefs findCycle(Random rng, int n, int c) {
         while (true) {
             Prefs prefs = Prefs.random(rng, n);
             PII pii = new PII(prefs);
             Permutation initial = Permutation.identity(n);
-            var result = pii.runOne(c, initial);
-            if (!result.snd())
+            Optional<Permutation> result = pii.runOrCycle(initial);
+            if (!result.isPresent())
                 return prefs;
         }
     }
 
     public static void main(String[] args) {
         Random rng = new Random(1);
-        Prefs nonTerminating = findNonTerminating(rng, 3, 50);
-        System.out.println(nonTerminating);
+        Prefs cyclePrefs = findCycle(rng, 3, 50);
+        System.out.println(cyclePrefs);
     }
 }
