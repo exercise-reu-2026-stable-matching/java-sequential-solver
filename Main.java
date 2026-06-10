@@ -1,11 +1,21 @@
+import java.util.Random;
+
 class Main {
+    /** Find a (randomly-generated) `Prefs` of size `n` that causes
+     * `runOne` with `c` to not yield a stable matching. */
+    static Prefs findNonTerminating(Random rng, int n, int c) {
+        while (true) {
+            Prefs prefs = Prefs.random(rng, n);
+            PII pii = new PII(prefs);
+            var result = pii.runOne(c, rng);
+            if (!result.snd())
+                return prefs;
+        }
+    }
+
     public static void main(String[] args) {
-        Pair<Prefs, Permutation> example = Examples.matthewExample;
-        PII pii = new PII(example.fst());
-        Permutation mensMatches = example.snd();
-        
-        var result = pii.runOne(5, mensMatches);
-        System.out.println("Success: " + result.snd());
-        System.out.println("Result: " + result.fst());
+        Random rng = new Random(1);
+        Prefs nonTerminating = findNonTerminating(rng, 3, 50);
+        System.out.println(nonTerminating);
     }
 }
