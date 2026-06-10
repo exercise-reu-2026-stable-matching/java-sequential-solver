@@ -1,3 +1,5 @@
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Random;
 
 record Prefs(Permutation[] malePrefs, Permutation[] femalePrefs) {
@@ -17,6 +19,18 @@ record Prefs(Permutation[] malePrefs, Permutation[] femalePrefs) {
             this.malePrefs[i] = new Permutation(decrement(malePrefs[i]));
             this.femalePrefs[i] = new Permutation(decrement(femalePrefs[i]));
         }
+    }
+
+    @Override 
+    public boolean equals(Object o) {
+        return o instanceof Prefs other 
+            && Arrays.equals(malePrefs, other.malePrefs) 
+            && Arrays.equals(femalePrefs, other.femalePrefs);
+    }
+
+    @Override 
+    public int hashCode() {
+        return Objects.hash(Arrays.hashCode(malePrefs), Arrays.hashCode(femalePrefs));
     }
 
     private static int[] decrement(int[] arr) {
