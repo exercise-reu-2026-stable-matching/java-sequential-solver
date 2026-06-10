@@ -1,35 +1,27 @@
-import java.util.Arrays;
-
-record Prefs(int[][] malePrefs, int[][] femalePrefs) {
-    // Checks if prefs are all permutations of [1..n]
-    private static void checkPerm(int[] row, int n) {
-        if (row.length != n)
-            throw new RuntimeException("Bad number of columns");
-        
-        // each element should be present exactly once
-        boolean[] present = new boolean[n];
-        for (int i = 0; i < n; i++) {
-            if (present[row[i] - 1])
-                throw new RuntimeException("Duplicate " + row[i] + " in row " + Arrays.toString(row));
-            present[row[i] - 1] = true;
-        }
-        for (int i = 0; i < n; i++)
-            if (!present[i])
-                throw new RuntimeException("Missing " + i + " in row " + Arrays.toString(row));
-    }
+record Prefs(Permutation[] malePrefs, Permutation[] femalePrefs) {
     
+    /** Treat each row of `malePrefs` and `femalePrefs` as a permutation. This convenience constructor
+     * expects the rows to be permutations of [1, n], not [0, n).
+     */
     Prefs(int[][] malePrefs, int[][] femalePrefs) {
-        this.malePrefs = malePrefs;
-        this.femalePrefs = femalePrefs;
+        this(new Permutation[malePrefs.length], new Permutation[malePrefs.length]);
 
         // assert invariants
         int n = malePrefs.length;
         if (n != femalePrefs.length)
             throw new RuntimeException("Bad number of rows for `femalePrefs`");
+
         for (int i = 0; i < n; i++) {
-            checkPerm(malePrefs[i], n);
-            checkPerm(femalePrefs[i], n);
+            this.malePrefs[i] = new Permutation(decrement(malePrefs[i]));
+            this.femalePrefs[i] = new Permutation(decrement(femalePrefs[i]));
         }
+    }
+
+    private static int[] decrement(int[] arr) {
+        int[] out = new int[arr.length];
+        for (int i = 0; i < arr.length; i++)
+            out[i] = arr[i] - 1;
+        return out;
     }
 
     /** 
@@ -37,7 +29,7 @@ record Prefs(int[][] malePrefs, int[][] femalePrefs) {
      * ranking matrix in the original PII paper.
      */
     @Override
-    public int[][] malePrefs() {
+    public Permutation[] malePrefs() {
         return malePrefs;
     }
 
@@ -46,16 +38,16 @@ record Prefs(int[][] malePrefs, int[][] femalePrefs) {
      * *transpose* of the ranking matrix in the original PII paper.
      */
     @Override
-    public int[][] femalePrefs() {
+    public Permutation[] femalePrefs() {
         return femalePrefs;
     }
 
     public int malePrefs(int man, int woman) {
-        return malePrefs[man][woman];
+        return malePrefs[man].get(woman);
     }
 
     public int femalePrefs(int woman, int man) {
-        return femalePrefs[woman][man];
+        return femalePrefs[woman].get(man);
     }
 
     int n() {

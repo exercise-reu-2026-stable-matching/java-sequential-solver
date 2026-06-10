@@ -16,10 +16,10 @@ class PII extends PIIBase {
 
         List<Index> out = new ArrayList<>();
         for (int y = 0; y < prefs.n(); y++) { // men
-            final int[] row = prefs.malePrefs()[y];
+            final Permutation row = prefs.malePrefs()[y];
             int idxOfMinLeftValue = -1;
             for (int x = 0; x < prefs.n(); x++) { // women
-                if (isUnstablePair(mensMatches, y, x) && (idxOfMinLeftValue == -1 || row[x] < row[idxOfMinLeftValue]))
+                if (isUnstablePair(mensMatches, y, x) && (idxOfMinLeftValue == -1 || row.get(x) < row.get(idxOfMinLeftValue)))
                     idxOfMinLeftValue = x;
             }
             if (idxOfMinLeftValue != -1)
