@@ -47,7 +47,7 @@ abstract class PIIBase {
         for (int i = 0; i < c * prefs.n(); i++) {
             if (isStableMatching(curr))
                 return new Pair<>(curr, true);
-            System.out.println("curr: " + curr);
+            // System.out.println("curr: " + curr);
             curr = iterationPhase(curr);
         }
         return new Pair<>(curr, isStableMatching(curr));
