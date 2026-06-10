@@ -1,5 +1,7 @@
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Random;
+import java.util.stream.Stream;
 
 /** A permutation on [0, n) */
 class Permutation {
@@ -94,5 +96,45 @@ class Permutation {
         for (int i = 0; i < n; i++)
             out[i] = perm[other.perm[i]];
         return new Permutation(out);
+    }
+
+    private static void swap(int[] arr, int i, int j) {
+        int tmp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = tmp;
+    }
+
+    /** The next permutation in the left-to-right lexicographic ordering, returning `null` once the end is reached.
+     */
+    private Permutation next() {
+        int n = size();
+        // smallest `i` such that everything after that index is decreasing. -1 if the permutation is decreasing everywhere
+        int i = n - 2;
+        for (; i >= 0; i--)
+            if (perm[i] < perm[i + 1])
+                break;
+        if (i < 0) return null;
+        
+        int[] nextPerm = Arrays.copyOf(perm, n);
+        
+        // find largest index > swapIdx with a larger value
+        int j = n - 1;
+        for (; j > i; j--)
+            if (perm[j] > perm[i])
+                break;
+        assert j > i;
+
+        swap(nextPerm, i, j);
+
+        // reverse everything after i
+        for (int k = i + 1, l = n - 1; k < l; k++, l--)
+            swap(nextPerm, k, l);
+
+        return new Permutation(nextPerm);
+    }
+
+    /** Return a finite stream of length `n!` of all permutations */
+    static Stream<Permutation> all(int n) {
+        return Stream.iterate(identity(n), Permutation::next).takeWhile(Objects::nonNull);
     }
 }
