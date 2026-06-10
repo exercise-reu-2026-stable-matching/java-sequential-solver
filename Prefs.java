@@ -68,19 +68,18 @@ record Prefs(Permutation[] malePrefs, Permutation[] femalePrefs) {
         return malePrefs.length;
     }
 
+    /** Print out the preferences matrix with 1-indexed preferences */
     @Override
     public String toString() {
-        List<String> lines = new ArrayList<>();
-        
-        lines.add("malePrefs:");
-        for (int i = 0; i < n(); i++)
-            lines.add(malePrefs[i].toString());
-
-        lines.add("femalePrefs:");
-        for (int i = 0; i < n(); i++)
-            lines.add(femalePrefs[i].toString());
-
-        return String.join("\n", lines);
+        StringBuilder sb = new StringBuilder();
+        int n = n();
+        for (int y = 0; y < n; y++) {
+            for (int x = 0; x < n; x++)
+                sb.append("(" + (malePrefs(y, x) + 1) + ", " + (femalePrefs(x, y) + 1) + ") ");
+            if (y + 1 < n)
+                sb.append("\n");
+        }
+        return sb.toString();
     }
 
 }
