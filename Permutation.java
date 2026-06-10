@@ -1,16 +1,30 @@
 import java.util.Random;
 
+/** A permutation on [0, n) */
 class Permutation {
     private final int[] perm;
     private final int[] inversePerm;
     
     Permutation(int[] perm) {
         this.perm = perm;
+
+        // make sure it's a bijection
+        boolean[] present = new boolean[perm.length];
+        for (int y : perm) {
+            if (present[y]) 
+                throw new RuntimeException("Duplicate " + y);
+            present[y] = true;
+        }
+        for (int y = 0; y < perm.length; y++)
+            if (!present[y])
+                throw new RuntimeException("Missing " + y);
+
         this.inversePerm = new int[perm.length];
         for (int i = 0; i < perm.length; i++)
             inversePerm[perm[i]] = i;
     }
     
+    /** `n` */
     int size() {
         return perm.length;
     }
