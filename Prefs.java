@@ -1,3 +1,7 @@
+import java.util.Random;
+import java.util.List;
+import java.util.ArrayList;
+
 record Prefs(Permutation[] malePrefs, Permutation[] femalePrefs) {
     
     /** Treat each row of `malePrefs` and `femalePrefs` as a permutation. This convenience constructor
@@ -22,6 +26,16 @@ record Prefs(Permutation[] malePrefs, Permutation[] femalePrefs) {
         for (int i = 0; i < arr.length; i++)
             out[i] = arr[i] - 1;
         return out;
+    }
+
+    static Prefs random(Random rng, int n) {
+        Permutation[] malePrefs = new Permutation[n];
+        Permutation[] femalePrefs = new Permutation[n];
+        for (int i = 0; i < n; i++) {
+            malePrefs[i] = Permutation.random(rng, n);
+            femalePrefs[i] = Permutation.random(rng, n);
+        }
+        return new Prefs(malePrefs, femalePrefs);
     }
 
     /** 
