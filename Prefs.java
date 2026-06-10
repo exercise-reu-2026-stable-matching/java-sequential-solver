@@ -68,4 +68,19 @@ record Prefs(Permutation[] malePrefs, Permutation[] femalePrefs) {
         return malePrefs.length;
     }
 
+    @Override
+    public String toString() {
+        List<String> lines = new ArrayList<>();
+        
+        lines.add("malePrefs:");
+        for (int i = 0; i < n(); i++)
+            lines.add(malePrefs[i].toString());
+
+        lines.add("femalePrefs:");
+        for (int i = 0; i < n(); i++)
+            lines.add(femalePrefs[i].toString());
+
+        return String.join("\n", lines);
+    }
+
 }
