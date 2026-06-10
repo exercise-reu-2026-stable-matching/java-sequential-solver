@@ -7,7 +7,8 @@ class Main {
         while (true) {
             Prefs prefs = Prefs.random(rng, n);
             PII pii = new PII(prefs);
-            var result = pii.runOne(c, rng);
+            Permutation initial = Permutation.identity(n);
+            var result = pii.runOne(c, initial);
             if (!result.snd())
                 return prefs;
         }
