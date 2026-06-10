@@ -11,6 +11,8 @@ class Permutation {
         // make sure it's a bijection
         boolean[] present = new boolean[perm.length];
         for (int y : perm) {
+            if (y < 0 || y >= perm.length)
+                throw new RuntimeException("Unexpected element " + y);
             if (present[y]) 
                 throw new RuntimeException("Duplicate " + y);
             present[y] = true;
