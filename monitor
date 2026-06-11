@@ -2,4 +2,4 @@
 
 
 
-watch -n 1 "sacct -n -X -j $1 -o \"state%20\" | sort | uniq -c"
+watch -n 1 "sacct -n -X -j $1 -o \"state%20\" --array | sort | uniq -c"
