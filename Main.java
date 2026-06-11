@@ -1,49 +1,55 @@
 import java.util.stream.Stream;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.List;
+import java.util.Objects;
 
 class Main {
-
-    private static <T, U, R> Stream<R> productMap(Stream<T> ts, Supplier<Stream<U>> us, BiFunction<T, U, R> f) {
-        return ts.flatMap(t -> us.get().map(u -> f.apply(t, u)));
+    /** Overwrites with the next sequence in the lexicographic ordering of `[0, k)^n`.
+     * Returns true iff we're not at the end of the sequence.
+     */
+    private static boolean nextSeq(long k, int[] arr) {
+        final int n = arr.length;
+        for (int i = n - 1; i >= 0; i--) {
+            if (arr[i] < k - 1) {
+                arr[i]++;
+                return true;
+            } else {
+                arr[i] = 0;
+                if (i == 0)
+                    return false;
+            }
+        }
+        throw new AssertionError("unreachable!");
     }
 
-    private static Stream<Permutation[]> allPrefsGo(int n, int fuel) {
-        if (fuel == 0) return Stream.ofNullable(new Permutation[0]);
-        Supplier<Stream<Permutation>> allPerms = () -> Permutation.all(n);
-        
-        return productMap(allPrefsGo(n, fuel - 1), allPerms, (tl, hd) -> {
-            Permutation[] next = Arrays.copyOf(tl, tl.length + 1);
-            next[next.length - 1] = hd;
-            return next;
+    /** The Cartesian product `[0, k)` `n` times total */
+    private static Stream<int[]> products(long k, int n) {
+        return Stream.iterate(new int[n], arr -> {
+            if (nextSeq(k, arr)) return arr; else return null;
+        }).takeWhile(Objects::nonNull);
+    }
+
+    private static long factorial(int n) {
+        long out = 1;
+        for (int i = 2; i <= n; i++)
+            out *= i;
+        return out;
+    }
+
+    /** All `(n!)^n` many `n x n` preference matrices */
+    private static Stream<Permutation[]> allPrefs(int n) {
+        final List<Permutation> allPerms = Permutation.all(n).toList();
+        return products(factorial(n), n).map(indices -> {
+            Permutation[] out = new Permutation[n];
+            for (int i = 0; i < n; i++)
+                out[i] = allPerms.get(indices[i]);
+            return out;
         });
     }
 
-    private static Stream<Permutation[]> allPrefs(int n) {
-        return allPrefsGo(n, n);
-    }
-
-    static void searchForCycles(int n, int howMany) {
-        Random rng = new Random(n);
-        Set<Prefs> cyclePrefs = new HashSet<>();
-        Permutation initial = Permutation.identity(n);
-        long count = 0;
-        
-        for (int i = 0; i < howMany; i++) {
-            Prefs prefs = Prefs.random(rng, n);
-            PII pii = new PII(prefs);
-            if (pii.runOrCycle(initial).isEmpty()) {
-                cyclePrefs.add(prefs);
-                count++;
-            }
-        }
-        for (Prefs p : cyclePrefs)
-            System.out.println(p + "\n");
-        System.out.println("Count: " + count + ", unique: " + cyclePrefs.size());
+    private static <T, U, R> Stream<R> productMap(Stream<T> ts, Supplier<Stream<U>> us, BiFunction<T, U, R> f) {
+        return ts.flatMap(t -> us.get().map(u -> f.apply(t, u)));
     }
 
     private static long cyclingCount = 0;
