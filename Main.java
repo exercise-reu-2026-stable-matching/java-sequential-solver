@@ -2,7 +2,9 @@ import java.util.stream.Stream;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 class Main {
 
@@ -26,19 +28,25 @@ class Main {
         return allPrefsGo(n, n);
     }
 
-    public static void main(String[] args) {
-        final int n = 3;
-
-        Stream<Permutation[]> allMalePrefs = allPrefs(n);
-        Supplier<Stream<Permutation[]>> allFemalePrefs = () -> allPrefs(n);
-        Stream<Prefs> allPrefs = productMap(allMalePrefs, allFemalePrefs, Prefs::new);
-        Permutation initialMatching = Permutation.identity(n);
+    static void searchForCycles(int n, int howMany) {
+        Random rng = new Random(n);
+        Set<Prefs> cyclePrefs = new HashSet<>();
+        Permutation initial = Permutation.identity(n);
         
-        List<Prefs> s = allPrefs
-            .filter(p -> new PII(p).runOrCycle(initialMatching).isEmpty())
-            .toList();
-        System.out.println(s.size());
-        for (Prefs p : s)
+        for (int i = 0; i < howMany; i++) {
+            Prefs prefs = Prefs.random(rng, n);
+            PII pii = new PII(prefs);
+            if (pii.runOrCycle(initial).isEmpty())
+                cyclePrefs.add(prefs);
+        }
+        for (Prefs p : cyclePrefs)
             System.out.println(p + "\n");
+        System.out.println("Count: " + cyclePrefs.size());
+    }
+
+    public static void main(String[] args) {
+        final int n = Integer.valueOf(args[0]);
+        final int howMany = Integer.valueOf(args[1]);
+        searchForCycles(n, howMany);
     }
 }
