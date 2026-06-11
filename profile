@@ -1,3 +1,5 @@
+#!/bin/zsh
+
 javac Main.java
 
 time java -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints\
