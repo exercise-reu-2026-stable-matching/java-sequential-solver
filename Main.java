@@ -62,6 +62,8 @@ class Main {
         final int chunk_size = Integer.valueOf(args[0]);
         final int process_id = Integer.valueOf(args[1]);
 
+        System.out.println("chunk_size = " + chunk_size + "; process_id = " + process_id);
+
         Stream<Permutation[]> malePrefs = allPrefs(n).skip((long)chunk_size * process_id).limit(chunk_size);
         Supplier<Stream<Permutation[]>> allFemalePrefs = () -> allPrefs(n);
         Stream<Prefs> allPrefs = productMap(malePrefs, allFemalePrefs, Prefs::new);

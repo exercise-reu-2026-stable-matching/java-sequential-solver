@@ -1,3 +1,8 @@
+# Output files
+output/
+*.out
+*.err
+
 # Compiled class file
 *.class
 

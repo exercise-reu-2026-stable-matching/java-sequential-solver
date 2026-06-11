@@ -1,0 +1,12 @@
+#!/usr/bin/zsh
+
+#SBATCH --job-name=simple-solver-run
+#SBATCH --output=output/%A_%40a.out
+#SBATCH --error=output/%A_%40a.err
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=1
+#SBATCH --time=12:00:00
+#SBATCH --partition=hslinux
+#SBATCH --array=0-999
+
+srun java Main 512 $SLURM_ARRAY_TASK_ID

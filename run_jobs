@@ -1,0 +1,6 @@
+#!/usr/bin/zsh
+
+rm -f *.class
+javac Main.java
+
+sbatch job
