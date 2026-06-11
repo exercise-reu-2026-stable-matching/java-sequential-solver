@@ -32,16 +32,19 @@ class Main {
         Random rng = new Random(n);
         Set<Prefs> cyclePrefs = new HashSet<>();
         Permutation initial = Permutation.identity(n);
+        long count = 0;
         
         for (int i = 0; i < howMany; i++) {
             Prefs prefs = Prefs.random(rng, n);
             PII pii = new PII(prefs);
-            if (pii.runOrCycle(initial).isEmpty())
+            if (pii.runOrCycle(initial).isEmpty()) {
                 cyclePrefs.add(prefs);
+                count++;
+            }
         }
         for (Prefs p : cyclePrefs)
             System.out.println(p + "\n");
-        System.out.println("Count: " + cyclePrefs.size());
+        System.out.println("Count: " + count + ", unique: " + cyclePrefs.size());
     }
 
     public static void main(String[] args) {
