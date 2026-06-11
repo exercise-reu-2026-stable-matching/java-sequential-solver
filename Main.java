@@ -12,7 +12,6 @@ class Main {
         return ts.flatMap(t -> us.get().map(u -> f.apply(t, u)));
     }
 
-    // TODO this has duplicates up to permutation
     private static Stream<Permutation[]> allPrefsGo(int n, int fuel) {
         if (fuel == 0) return Stream.ofNullable(new Permutation[0]);
         Supplier<Stream<Permutation>> allPerms = () -> Permutation.all(n);
@@ -47,9 +46,25 @@ class Main {
         System.out.println("Count: " + count + ", unique: " + cyclePrefs.size());
     }
 
+    private static long cyclingCount = 0;
+
     public static void main(String[] args) {
-        final int n = Integer.valueOf(args[0]);
-        final int howMany = Integer.valueOf(args[1]);
-        searchForCycles(n, howMany);
+        // Search over the entire state space. Only really possible for n <= 4, and n = 4 requires a lot of compute
+        final int n = 4;
+
+        // Split up the work by having each Java process work on a chunk of the male preferences
+        final int chunk_size = Integer.valueOf(args[0]);
+        final int process_id = Integer.valueOf(args[1]);
+
+        Stream<Permutation[]> malePrefs = allPrefs(n).skip((long)chunk_size * process_id).limit(chunk_size);
+        Supplier<Stream<Permutation[]>> allFemalePrefs = () -> allPrefs(n);
+        Stream<Prefs> allPrefs = productMap(malePrefs, allFemalePrefs, Prefs::new);
+        Permutation initial = Permutation.identity(n);
+        Stream<Prefs> cycling = allPrefs.filter(p -> new PII(p).runOrCycle(initial).isEmpty());
+        cycling.forEach(prefs -> {
+            System.out.println(prefs + "\n");
+            cyclingCount++;
+        });
+        System.out.println("Count: " + cyclingCount);
     }
 }
