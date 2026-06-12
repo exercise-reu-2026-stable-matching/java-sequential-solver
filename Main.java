@@ -1,8 +1,8 @@
-import java.util.stream.Stream;
-import java.util.function.BiFunction;
-import java.util.function.Supplier;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 class Main {
     /** Overwrites with the next sequence in the lexicographic ordering of `[0, k)^n`.
@@ -52,27 +52,31 @@ class Main {
         return ts.flatMap(t -> us.get().map(u -> f.apply(t, u)));
     }
 
-    private static long cyclingCount = 0;
+    private static int nUnstablePairs(PII pii, Permutation mensMatches) {
+        int count = 0;
+        for (int i = 0; i < pii.prefs.n(); i++)
+            for (int j = 0; j < pii.prefs.n(); j++)
+                if (pii.isUnstablePair(mensMatches, i, j))
+                    count++;
+        return count;
+    }
+
+    private static boolean f(Prefs prefs) {
+        PII pii = new PII(prefs);
+        Permutation mensMatches = Permutation.identity(prefs.n());
+        int n1 = nUnstablePairs(pii, mensMatches);
+
+        if (pii.nm2GeneratingGraph.get(mensMatches).size() != 1)
+            return false;
+        Permutation matches2 = pii.iterationPhase(mensMatches);
+        int n2 = nUnstablePairs(pii, matches2);
+        return n1 < n2;
+    }
 
     public static void main(String[] args) {
-        // Search over the entire state space. Only really possible for n <= 4, and n = 4 requires a lot of compute
         final int n = 3;
-
-        // Split up the work by having each Java process work on a chunk of the male preferences
-        final int chunk_size = Integer.valueOf(args[0]);
-        final int process_id = Integer.valueOf(args[1]);
-
-        System.out.println("chunk_size = " + chunk_size + "; process_id = " + process_id);
-
-        Stream<Permutation[]> malePrefs = allPrefs(n).skip((long)chunk_size * process_id).limit(chunk_size);
-        Supplier<Stream<Permutation[]>> allFemalePrefs = () -> allPrefs(n);
-        Stream<Prefs> allPrefs = productMap(malePrefs, allFemalePrefs, Prefs::new);
-        Permutation initial = Permutation.identity(n);
-        Stream<Prefs> cycling = allPrefs.filter(p -> new PII(p).runOrCycle(initial).isEmpty());
-        cycling.forEach(prefs -> {
-            System.out.println(prefs + "\n");
-            cyclingCount++;
-        });
-        System.out.println("Count: " + cyclingCount);
+        productMap(allPrefs(n), () -> allPrefs(n), Prefs::new)
+            .filter(Main::f)
+            .forEach(prefs -> System.out.println(prefs + "\n"));
     }
 }
