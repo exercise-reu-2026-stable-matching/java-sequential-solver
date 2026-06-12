@@ -86,8 +86,13 @@ record Prefs(Permutation[] malePrefs, Permutation[] femalePrefs) {
         StringBuilder sb = new StringBuilder();
         int n = n();
         for (int y = 0; y < n; y++) {
-            for (int x = 0; x < n; x++)
-                sb.append("(" + (malePrefs(y, x) + 1) + ", " + (femalePrefs(x, y) + 1) + ") ");
+            for (int x = 0; x < n; x++) {
+                sb.append("(");
+                sb.append(malePrefs(y, x) + 1);
+                sb.append(", ");
+                sb.append(femalePrefs(x, y) + 1);
+                sb.append(") ");
+            }
             if (y + 1 < n)
                 sb.append("\n");
         }

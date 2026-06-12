@@ -66,7 +66,7 @@ class Main {
         Permutation mensMatches = Permutation.identity(prefs.n());
         int n1 = nUnstablePairs(pii, mensMatches);
 
-        if (pii.nm2GeneratingGraph.get(mensMatches).size() != 1)
+        if (pii.nm2GeneratingGraphImpl.get(mensMatches).size() != 1)
             return false;
         Permutation matches2 = pii.iterationPhase(mensMatches);
         int n2 = nUnstablePairs(pii, matches2);
