@@ -1,3 +1,6 @@
+# Output files
+output/*
+
 # Compiled class file
 *.class
 
@@ -16,6 +19,7 @@
 *.nar
 *.ear
 *.zip
+!output.zip
 *.tar.gz
 *.rar
 
