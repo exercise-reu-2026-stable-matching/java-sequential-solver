@@ -1,7 +1,5 @@
 # Output files
-output/
-*.out
-*.err
+output/*
 
 # Compiled class file
 *.class
@@ -21,6 +19,7 @@ output/
 *.nar
 *.ear
 *.zip
+!output.zip
 *.tar.gz
 *.rar
 
