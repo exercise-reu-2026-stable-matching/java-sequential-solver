@@ -1,0 +1,4 @@
+#!/usr/bin/zsh
+
+# Count number of preference matrices that don't converge (cycle)
+tail -n 1 output/*.out | sed -rn "s/Count: (.*)/\1/p" | paste -sd+ | bc
