@@ -40,7 +40,7 @@ record Prefs(Permutation[] malePrefs, Permutation[] femalePrefs) {
         return out;
     }
 
-    static Prefs random(Random rng, int n) {
+    public static Prefs random(Random rng, int n) {
         Permutation[] malePrefs = new Permutation[n];
         Permutation[] femalePrefs = new Permutation[n];
         for (int i = 0; i < n; i++) {

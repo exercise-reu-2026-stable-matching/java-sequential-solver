@@ -1,6 +1,6 @@
 class Examples {
     // Initial matching in the example from the slides
-    static final Pair<Prefs, Permutation> slidesExample;
+    public static final Pair<Prefs, Permutation> slidesExample;
     static {
         int[][] malePrefs = {
             { 4, 2, 3, 1 },
@@ -20,7 +20,7 @@ class Examples {
     }
 
     // Jeffrey's example that we worked out together
-    static final Pair<Prefs, Permutation> jeffreyExample;
+    public static final Pair<Prefs, Permutation> jeffreyExample;
     static {
         int[][] malePrefs = {
             { 3, 4, 5, 1, 6, 2 },
@@ -44,7 +44,7 @@ class Examples {
     }
 
     // Matthew's example
-    static final Pair<Prefs, Permutation> matthewExample;
+    public static final Pair<Prefs, Permutation> matthewExample;
     static {
         int[][] malePrefs = {
             {  2,  4, 10,  9,  5,  3,  8,  6,  1,  7 },

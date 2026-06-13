@@ -1,7 +1,7 @@
 import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 import java.util.Random;
+import java.util.Set;
 
 abstract class PIIBase {
     final Prefs prefs;
@@ -56,7 +56,7 @@ abstract class PIIBase {
         return new Pair<>(curr, isStableMatching(curr));
     }
 
-    final Optional<Permutation> runOrCycle(Permutation initial) {
+    public final Optional<Permutation> runOrCycle(Permutation initial) {
         Permutation curr = initial;
         Set<Permutation> visited = new HashSet<>();
 
@@ -69,7 +69,7 @@ abstract class PIIBase {
     }
 
     /** Keep running `runOne` until a stable matching is found */
-    final Permutation run(int c, Random rng) {
+    public final Permutation run(int c, Random rng) {
         Pair<Permutation, Boolean> res;
         do {
             res = runOne(c, rng);

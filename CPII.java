@@ -1,5 +1,5 @@
 class CPII extends PIIBase {
-    CPII(Prefs prefs) {
+    public CPII(Prefs prefs) {
         super(prefs);
     }
 
