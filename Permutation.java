@@ -7,6 +7,11 @@ import java.util.stream.Stream;
 class Permutation {
     private final int[] perm;
     private final int[] inversePerm;
+
+    private Permutation(int[] perm, int[] inversePerm) {
+        this.perm = perm;
+        this.inversePerm = inversePerm;
+    }
     
     Permutation(int[] perm) {
         this.perm = perm;
@@ -40,6 +45,10 @@ class Permutation {
 
     int getInverse(int index) {
         return inversePerm[index];
+    }
+
+    Permutation invert() {
+        return new Permutation(inversePerm, perm);
     }
 
     static Permutation random(Random rng, int n) {

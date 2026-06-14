@@ -7,11 +7,13 @@ import java.util.Map;
 import java.util.Set;
 
 class PII extends PIIBase {
+    private final Permutation mensMatches; // TODO remove since this is just id
     PII(Prefs prefs) {
         super(prefs);
+        mensMatches = Permutation.identity(prefs.n());
     }
 
-    List<Index> nm1GeneratingPairs(Permutation mensMatches) {
+    List<Index> nm1GeneratingPairs() {
         checkPermLength(mensMatches);
 
         List<Index> out = new ArrayList<>();
@@ -28,7 +30,7 @@ class PII extends PIIBase {
         return out;
     }
 
-    List<Index> nm1Pairs(Permutation mensMatches, List<Index> nm1GeneratingPairs) {
+    List<Index> nm1Pairs(List<Index> nm1GeneratingPairs) {
         checkPermLength(mensMatches);
 
         // this is pretty inefficient but it's easy to understand
@@ -45,7 +47,7 @@ class PII extends PIIBase {
     }
 
     /** Return a map from an nm1-pair to its corresponding nm2-generating pair. This map is injective */
-    Map<Index, Index> nm2GeneratingPairs (Permutation mensMatches, List<Index> nm1Pairs) {
+    Map<Index, Index> nm2GeneratingPairs(List<Index> nm1Pairs) {
         checkPermLength(mensMatches);
 
         Map<Index, Index> out = new HashMap<>();
@@ -87,7 +89,7 @@ class PII extends PIIBase {
     // Equivalently, for every nm2-generating pair `a_{l, k}`, there are two matching pairs `a_{i, k}` and `a_{l, j}`,
     // where `i` is the man matched with woman `k` and `j` is the woman matched with man `l`.
     // We put `a_{l, k}` at both indices `i` and `l` (the men).
-    IndexForMatchingPair[] nm2GeneratingPairsAssociatedWithMatchingPair(Permutation mensMatches, Map<Index, Index> nm2GeneratingPairs) {
+    IndexForMatchingPair[] nm2GeneratingPairsAssociatedWithMatchingPair(Map<Index, Index> nm2GeneratingPairs) {
         checkPermLength(mensMatches);
 
         IndexForMatchingPair[] out = new IndexForMatchingPair[prefs.n()];
@@ -129,7 +131,7 @@ class PII extends PIIBase {
      * The col-pointer is defined similarly but with the order switched.
      * Singleton nodes are still present in the keys of the returned map. Values are never null (but the fields may be)
      */
-    Map<Index, Edges> nm2GeneratingGraph(Permutation mensMatches, IndexForMatchingPair[] nm2GeneratingPairsAssociatedWithMatchingPairs) {
+    Map<Index, Edges> nm2GeneratingGraph(IndexForMatchingPair[] nm2GeneratingPairsAssociatedWithMatchingPairs) {
         checkPermLength(mensMatches);
 
         Map<Index, Edges> out = new HashMap<>();
@@ -185,7 +187,7 @@ class PII extends PIIBase {
         return new Index(rEnd.y(), cEnd.x());
     }
 
-    Set<Index> nm2Pairs(Permutation mensMatches, Map<Index, Edges> nm2GeneratingGraph) {
+    Set<Index> nm2Pairs(Map<Index, Edges> nm2GeneratingGraph) {
         Set<Index> out = new HashSet<>();
 
         // This does a ton of extra work TODO
@@ -213,15 +215,13 @@ class PII extends PIIBase {
     };
 
     @Override
-    Permutation iterationPhase(Permutation mensMatches) {
-        checkPermLength(mensMatches);
-
-        List<Index> nm1Pairs = nm1Pairs(mensMatches, nm1GeneratingPairs(mensMatches));
+    Permutation iterationPhase() {
+        List<Index> nm1Pairs = nm1Pairs(nm1GeneratingPairs());
         Set<Index> nmPairs = // initially nm2 pairs
-            nm2Pairs(mensMatches, 
-                nm2GeneratingGraph(mensMatches, 
-                    nm2GeneratingPairsAssociatedWithMatchingPair(mensMatches, 
-                        nm2GeneratingPairs(mensMatches, nm1Pairs))));
+            nm2Pairs(
+                nm2GeneratingGraph(
+                    nm2GeneratingPairsAssociatedWithMatchingPair(
+                        nm2GeneratingPairs(nm1Pairs))));
         checkNMPairs(nm1Pairs, nmPairs);
         nmPairs.addAll(nm1Pairs);
 
@@ -231,7 +231,7 @@ class PII extends PIIBase {
             perm[nmPair.y()] = nmPair.x();
         for (int y = 0; y < prefs.n(); y++)
             if (perm[y] == -1)
-                perm[y] = mensMatches.get(y); // the original
+                perm[y] = y; // the original
 
         // check still injective
         for (int y1 = 0; y1 < prefs.n(); y1++) for (int y2 = 0; y2 < prefs.n(); y2++)
@@ -240,8 +240,36 @@ class PII extends PIIBase {
         return new Permutation(perm);
     }
 
-    @Override
-    Permutation iterationPhase() {
-        return iterationPhase(Permutation.identity(prefs.n()));
-    }
+    // @Override 
+    // Permutation iterationPhase(Permutation mensMatches) { 
+    //     int n = mensMatches.size();
+    //     // undo `mensMatches` so that the matches are along the diagonal
+    //     Permutation[] malePrefs = prefs.malePrefs();
+    //     Permutation[] femalePrefs = prefs.femalePrefs();
+    //     Permutation[] malePrefs2 = new Permutation[n];
+    //     Permutation[] femalePrefs2 = new Permutation[n];
+
+    //     System.out.println("mensMatches: " + mensMatches);
+    //     System.out.println("original prefs:\n" + prefs);
+
+    //     for (int i = 0; i < n; i++) {
+    //         // apply mensMatches^{-1} to the order of malePrefs
+    //         malePrefs2[mensMatches.getInverse(i)] = malePrefs[i];
+
+    //         System.out.println("femalePrefs[i] = " + femalePrefs[i]);
+    //         femalePrefs2[i] = femalePrefs[i].compose(mensMatches.invert());
+    //         System.out.println("femalePrefs2[i] = " + femalePrefs2[i]);
+    //     }
+
+    //     Prefs prefs2 = new Prefs(malePrefs2, femalePrefs2);
+
+    //     System.out.println("new prefs:\n" + prefs2);
+
+    //     PII pii = new PII(prefs2); // TODO
+    //     Permutation raw = pii.iterationPhase();
+    //     System.out.println("raw nm1-gen pairs: " + pii.nm1GeneratingPairs());
+    //     System.out.println("raw nm1Pairs: " + pii.nm1Pairs(pii.nm1GeneratingPairs()));
+    //     System.out.println("raw: " + raw + "\n");
+    //     return mensMatches.compose(raw);
+    // }
 }

@@ -74,4 +74,38 @@ class Examples {
             new Prefs(malePrefs, femalePrefs),
             new Permutation(new int[]{ 1, 7, 3, 0, 5, 6, 9, 8, 4, 2 }));
     }
+
+    public static final Pair<Prefs, Permutation> threeExample;
+    static {
+        int[][] malePrefs = {
+            { 1, 2, 3 },
+            { 1, 2, 3 },
+            { 1, 2, 3 }
+        };
+        int[][] femalePrefs = {
+            { 3, 2, 1 },
+            { 2, 3, 1 },
+            { 3, 1, 2 }
+        };
+        threeExample = new Pair<>(
+            new Prefs(malePrefs, femalePrefs),
+            Permutation.identity(3));
+    }
+
+    public static final Pair<Prefs, Permutation> threeExample2;
+    static {
+        int[][] malePrefs = {
+            { 3, 2, 1 },
+            { 3, 2, 1 },
+            { 2, 1, 3 }
+        };
+        int[][] femalePrefs = {
+            { 3, 2, 1 },
+            { 3, 1, 2 },
+            { 3, 2, 1 }
+        };
+        threeExample2 = new Pair<>(
+            new Prefs(malePrefs, femalePrefs),
+            Permutation.identity(3));
+    }
 }

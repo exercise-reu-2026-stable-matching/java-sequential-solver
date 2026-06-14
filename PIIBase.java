@@ -15,14 +15,11 @@ abstract class PIIBase {
     }
 
     /** Given the identity permutation (men's matches) as input, compute the next permutation after one PII iteration.
-      * This function should respect composition, so that the
-      * other overload satisfies iterationPhase(p \circ q) = p \circ iterationPhase(q) for all permutations p. */
+      * This function should respect composition, so that TODO */
     abstract Permutation iterationPhase();
 
     /** Given the men's matches as input, compute the next permutation after one PII iteration */
-    Permutation iterationPhase(Permutation mensMatches) {
-        return mensMatches.compose(iterationPhase());
-    }
+    // abstract Permutation iterationPhase(Permutation mensMatches);
 
     boolean isUnstablePair(Permutation mensMatches, int y, int x) {
         int matchedWoman = mensMatches.get(y);
@@ -50,6 +47,25 @@ abstract class PIIBase {
         return runOne(c, initial);
     }
 
+    // Apply `p` to the rows and columns of `prefs`
+    private static Prefs permutePrefs(Prefs prefs, Permutation p) {
+        int n = p.size(); // TODO check this is correct against prefs
+        
+        Permutation[] malePrefs = prefs.malePrefs();
+        Permutation[] femalePrefs = prefs.femalePrefs();
+        Permutation[] malePrefs2 = new Permutation[n];
+        Permutation[] femalePrefs2 = new Permutation[n];
+
+        // undo `p` so that the matches are along the diagonal
+        for (int i = 0; i < n; i++) {
+            // apply p to the order of malePrefs
+            malePrefs2[p.get(i)] = malePrefs[i];
+            // same for femalePrefs
+            femalePrefs2[i] = femalePrefs[i].compose(p);
+        }
+        return new Prefs(malePrefs2, femalePrefs2);
+    }
+
     /** Do one `initiationPhase` and at most `c * n` `iterationPhase`s until a stable matching is reached.
      * Returns the output and whether it's a stable matching.
       */
@@ -59,7 +75,11 @@ abstract class PIIBase {
             if (isStableMatching(curr))
                 return new Pair<>(curr, true);
             // System.out.println("curr: " + curr);
-            curr = iterationPhase(curr);
+            
+            // prefs but rearranged so that querying about its identity matching
+            // is equivalent to querying about the original's matching under curr
+            Prefs prefs0 = permutePrefs(this.prefs, curr.invert());
+            curr = new PII(prefs0).iterationPhase();
         }
         return new Pair<>(curr, isStableMatching(curr));
     }
@@ -68,11 +88,16 @@ abstract class PIIBase {
         Permutation curr = initial;
         Set<Permutation> visited = new HashSet<>();
 
+        System.out.println("entry");
         while (!isStableMatching(curr)) {
+            System.out.println("here: " + curr);
             if (visited.contains(curr)) return Optional.empty();
             visited.add(curr);
-            curr = iterationPhase(curr);
+
+            Prefs prefs0 = permutePrefs(this.prefs, curr.invert());
+            curr = new PII(prefs0).iterationPhase().compose(curr);
         }
+        System.out.println("here: " + curr);
         return Optional.of(curr);
     }
 
