@@ -62,7 +62,7 @@ class Main {
         final int chunkSize = Integer.parseInt(args[0]);
         final int processID = Integer.parseInt(args[1]);
 
-        System.out.println("chunk_size = " + chunkSize + "; process_id = " + processID);
+        System.out.println("chunkSize = " + chunkSize + "; processID = " + processID);
 
         Stream<Permutation[]> malePrefs = allPrefs(n).skip((long)chunkSize * processID).limit(chunkSize);
         Supplier<Stream<Permutation[]>> allFemalePrefs = () -> allPrefs(n);
