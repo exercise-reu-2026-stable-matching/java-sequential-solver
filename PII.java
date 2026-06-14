@@ -197,7 +197,7 @@ class PII extends PIIBase {
         return out;
     }
 
-    Set<Index> nmPairs(Permutation mensMatches, List<Index> nm1Pairs, Set<Index> nm2Pairs) {
+    protected void checkNMPairs(List<Index> nm1Pairs, Set<Index> nm2Pairs) {
         boolean[] inRow = new boolean[prefs.n()];
         boolean[] inCol = new boolean[prefs.n()];
         for (Index i : nm1Pairs) { 
@@ -210,9 +210,6 @@ class PII extends PIIBase {
             inRow[i.y()] = true;
             inCol[i.x()] = true;
         }
-        
-        nm2Pairs.addAll(nm1Pairs);
-        return nm2Pairs;
     };
 
     @Override
@@ -220,12 +217,13 @@ class PII extends PIIBase {
         checkPermLength(mensMatches);
 
         List<Index> nm1Pairs = nm1Pairs(mensMatches, nm1GeneratingPairs(mensMatches));
-        Set<Index> nm2Pairs = 
+        Set<Index> nmPairs = // initially nm2 pairs
             nm2Pairs(mensMatches, 
                 nm2GeneratingGraph(mensMatches, 
                     nm2GeneratingPairsAssociatedWithMatchingPair(mensMatches, 
                         nm2GeneratingPairs(mensMatches, nm1Pairs))));
-        Set<Index> nmPairs = nmPairs(mensMatches, nm1Pairs, nm2Pairs);
+        checkNMPairs(nm1Pairs, nmPairs);
+        nmPairs.addAll(nm1Pairs);
 
         int[] perm = new int[prefs.n()];
         Arrays.fill(perm, -1);
