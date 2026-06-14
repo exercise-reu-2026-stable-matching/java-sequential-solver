@@ -59,8 +59,8 @@ class Main {
         final int n = 3;
 
         // Split up the work by having each Java process work on a chunk of the male preferences
-        final int chunkSize = Integer.valueOf(args[0]);
-        final int processID = Integer.valueOf(args[1]);
+        final int chunkSize = Integer.parseInt(args[0]);
+        final int processID = Integer.parseInt(args[1]);
 
         System.out.println("chunk_size = " + chunkSize + "; process_id = " + processID);
 
