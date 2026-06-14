@@ -1,5 +1,7 @@
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 
 abstract class PIIBase {
     final Prefs prefs;
@@ -55,18 +57,15 @@ abstract class PIIBase {
     }
 
     public final Optional<Permutation> runOrCycle(Permutation initial) {
-        // Floyd's algorithm
-        Permutation slow = initial;
-        Permutation fast = iterationPhase(initial);
+        Permutation curr = initial;
+        Set<Permutation> visited = new HashSet<>();
 
-        while (!isStableMatching(fast)) {
-            if (slow.equals(fast)) return Optional.empty();
-            slow = iterationPhase(slow);
-            fast = iterationPhase(fast);
-            if (!isStableMatching(fast))
-                fast = iterationPhase(fast);
+        while (!isStableMatching(curr)) {
+            if (visited.contains(curr)) return Optional.empty();
+            visited.add(curr);
+            curr = iterationPhase(curr);
         }
-        return Optional.of(fast);
+        return Optional.of(curr);
     }
 
     /** Keep running `runOne` until a stable matching is found */
