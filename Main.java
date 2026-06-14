@@ -87,11 +87,15 @@ class Main {
         
         System.out.println(latinSquares.size() + " latin squares\n");
         
+        int count = 0;
         for (Permutation[] malePrefs : latinSquares)
             for (Permutation[] femalePrefs : latinSquares) {
                 Prefs prefs = new Prefs(malePrefs, femalePrefs);
-                if (new PII(prefs).runOrCycle(initial).isEmpty())
+                if (new PII(prefs).runOrCycle(initial).isEmpty()) {
                     System.out.println(prefs + "\n");
+                    count++;
+                }
             }
+        System.out.println("count: " + count);
     }
 }
