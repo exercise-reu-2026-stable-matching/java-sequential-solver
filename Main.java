@@ -1,8 +1,8 @@
-import java.util.stream.Stream;
-import java.util.function.BiFunction;
-import java.util.function.Supplier;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 class Main {
     /** Overwrites with the next sequence in the lexicographic ordering of `[0, k)^n`.
@@ -59,12 +59,12 @@ class Main {
         final int n = 3;
 
         // Split up the work by having each Java process work on a chunk of the male preferences
-        final int chunk_size = Integer.valueOf(args[0]);
-        final int process_id = Integer.valueOf(args[1]);
+        final int chunkSize = Integer.valueOf(args[0]);
+        final int processID = Integer.valueOf(args[1]);
 
-        System.out.println("chunk_size = " + chunk_size + "; process_id = " + process_id);
+        System.out.println("chunk_size = " + chunkSize + "; process_id = " + processID);
 
-        Stream<Permutation[]> malePrefs = allPrefs(n).skip((long)chunk_size * process_id).limit(chunk_size);
+        Stream<Permutation[]> malePrefs = allPrefs(n).skip((long)chunkSize * processID).limit(chunkSize);
         Supplier<Stream<Permutation[]>> allFemalePrefs = () -> allPrefs(n);
         Stream<Prefs> allPrefs = productMap(malePrefs, allFemalePrefs, Prefs::new);
         Permutation initial = Permutation.identity(n);
