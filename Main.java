@@ -56,7 +56,7 @@ class Main {
 
     public static void main(String[] args) {
         // Search over the entire state space. Only really possible for n <= 4, and n = 4 requires a lot of compute
-        final int n = 3;
+        final int n = 4;
 
         // Split up the work by having each Java process work on a chunk of the male preferences
         final int chunkSize = Integer.parseInt(args[0]);

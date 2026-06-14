@@ -11,7 +11,7 @@ class PII extends PIIBase {
         super(prefs);
     }
 
-    final Cached<Permutation, List<Index>> nm1GeneratingPairsImpl = new Cached<>(mensMatches -> {
+    List<Index> nm1GeneratingPairs(Permutation mensMatches) {
         checkPermLength(mensMatches);
 
         List<Index> out = new ArrayList<>();
@@ -26,12 +26,11 @@ class PII extends PIIBase {
                 out.add(new Index(y, idxOfMinLeftValue));
         }
         return out;
-    });
+    }
 
-    final Cached<Permutation, List<Index>> nm1PairsImpl = new Cached<>(mensMatches -> {
+    List<Index> nm1Pairs(Permutation mensMatches, List<Index> nm1GeneratingPairs) {
         checkPermLength(mensMatches);
 
-        List<Index> nm1GeneratingPairs = nm1GeneratingPairsImpl.get(mensMatches);
         // this is pretty inefficient but it's easy to understand
         Map<Integer, Integer> generatingRowsOfCols = new HashMap<>();
         for (Index i : nm1GeneratingPairs) {
@@ -43,14 +42,14 @@ class PII extends PIIBase {
         for (var e : generatingRowsOfCols.entrySet())
             out.add(new Index(e.getValue(), e.getKey()));
         return out;
-    });
+    }
 
     /** Return a map from an nm1-pair to its corresponding nm2-generating pair. This map is injective */
-    final Cached<Permutation, Map<Index, Index>> nm2GeneratingPairsImpl = new Cached<>(mensMatches -> {
+    Map<Index, Index> nm2GeneratingPairs (Permutation mensMatches, List<Index> nm1Pairs) {
         checkPermLength(mensMatches);
 
         Map<Index, Index> out = new HashMap<>();
-        for (Index pair : nm1PairsImpl.get(mensMatches)) {
+        for (Index pair : nm1Pairs) {
             int i = pair.y();
             int j = pair.x();
             int k = mensMatches.get(i);
@@ -67,7 +66,7 @@ class PII extends PIIBase {
         }
             
         return out;
-    });
+    }
 
     // For some matching pair (not in this class), two points that each share the row and column of the matching pair, respectively
     static class IndexForMatchingPair {
@@ -88,15 +87,14 @@ class PII extends PIIBase {
     // Equivalently, for every nm2-generating pair `a_{l, k}`, there are two matching pairs `a_{i, k}` and `a_{l, j}`,
     // where `i` is the man matched with woman `k` and `j` is the woman matched with man `l`.
     // We put `a_{l, k}` at both indices `i` and `l` (the men).
-    final Cached<Permutation, IndexForMatchingPair[]> nm2GeneratingPairsAssociatedWithMatchingPairImpl = 
-        new Cached<>(mensMatches -> {
+    IndexForMatchingPair[] nm2GeneratingPairsAssociatedWithMatchingPair(Permutation mensMatches, Map<Index, Index> nm2GeneratingPairs) {
         checkPermLength(mensMatches);
 
         IndexForMatchingPair[] out = new IndexForMatchingPair[prefs.n()];
         for (int i = 0; i < prefs.n(); i++)
             out[i] = new IndexForMatchingPair();
         
-        for (var e : nm2GeneratingPairsImpl.get(mensMatches).entrySet()) {
+        for (var e : nm2GeneratingPairs.entrySet()) {
             Index nm1Pair = e.getKey(); // a_{i, j}
             Index nm2GeneratingPair = e.getValue(); // a_{l, k}
             int i = nm1Pair.y();
@@ -112,7 +110,7 @@ class PII extends PIIBase {
         }
 
         return out;
-    });
+    }
 
     /** Both fields can be `null` */
     static class Edges {
@@ -131,12 +129,10 @@ class PII extends PIIBase {
      * The col-pointer is defined similarly but with the order switched.
      * Singleton nodes are still present in the keys of the returned map. Values are never null (but the fields may be)
      */
-    final Cached<Permutation, Map<Index, Edges>> nm2GeneratingGraphImpl = new Cached<>(mensMatches -> {
+    Map<Index, Edges> nm2GeneratingGraph(Permutation mensMatches, IndexForMatchingPair[] nm2GeneratingPairsAssociatedWithMatchingPairs) {
         checkPermLength(mensMatches);
 
         Map<Index, Edges> out = new HashMap<>();
-        IndexForMatchingPair[] nm2GeneratingPairsAssociatedWithMatchingPairs = 
-            nm2GeneratingPairsAssociatedWithMatchingPairImpl.get(mensMatches);
         for (int y = 0; y < prefs.n(); y++) { // men
             IndexForMatchingPair idxForNM2GeneratingPairs = nm2GeneratingPairsAssociatedWithMatchingPairs[y];
             Index inCol = idxForNM2GeneratingPairs.inCol;
@@ -150,11 +146,10 @@ class PII extends PIIBase {
             }
         }
         return out;
-    });
+    }
 
     /** Returns the nm2-pair from the row end and column end of a chain; otherwise `null` for cycles */
-    private Index nm2PairFromChain(Permutation mensMatches, Index start) {
-        final Map<Index, Edges> nm2GeneratingGraph = nm2GeneratingGraphImpl.get(mensMatches);
+    private Index nm2PairFromChain(Permutation mensMatches, Index start, Map<Index, Edges> nm2GeneratingGraph) {
         Index rEnd = null;
         for (Index curr = start; ; ) {
             Index next = nm2GeneratingGraph.get(curr).rPtr;
@@ -190,23 +185,19 @@ class PII extends PIIBase {
         return new Index(rEnd.y(), cEnd.x());
     }
 
-    final Cached<Permutation, Set<Index>> nm2PairsImpl = new Cached<>(mensMatches -> {
-        Map<Index, Edges> nm2GeneratingGraph = nm2GeneratingGraphImpl.get(mensMatches);
+    Set<Index> nm2Pairs(Permutation mensMatches, Map<Index, Edges> nm2GeneratingGraph) {
         Set<Index> out = new HashSet<>();
 
         // This does a ton of extra work TODO
         for (Index nm2GeneratingPair : nm2GeneratingGraph.keySet()) {
-            Index nm2Pair = nm2PairFromChain(mensMatches, nm2GeneratingPair);
+            Index nm2Pair = nm2PairFromChain(mensMatches, nm2GeneratingPair, nm2GeneratingGraph);
             if (nm2Pair != null)
                 out.add(nm2Pair);
         }
         return out;
-    });
+    }
 
-    final Cached<Permutation, Set<Index>> nmPairsImpl = new Cached<>(mensMatches -> {
-        List<Index> nm1Pairs = nm1PairsImpl.get(mensMatches);
-        Set<Index> nm2Pairs = nm2PairsImpl.get(mensMatches);
-        
+    Set<Index> nmPairs(Permutation mensMatches, List<Index> nm1Pairs, Set<Index> nm2Pairs) {
         boolean[] inRow = new boolean[prefs.n()];
         boolean[] inCol = new boolean[prefs.n()];
         for (Index i : nm1Pairs) { 
@@ -222,14 +213,23 @@ class PII extends PIIBase {
         
         nm2Pairs.addAll(nm1Pairs);
         return nm2Pairs;
-    });
+    };
 
-    private final Cached<Permutation, Permutation> iterationPhaseImpl = new Cached<>(mensMatches -> {
+    @Override
+    public Permutation iterationPhase(Permutation mensMatches) {
         checkPermLength(mensMatches);
+
+        List<Index> nm1Pairs = nm1Pairs(mensMatches, nm1GeneratingPairs(mensMatches));
+        Set<Index> nm2Pairs = 
+            nm2Pairs(mensMatches, 
+                nm2GeneratingGraph(mensMatches, 
+                    nm2GeneratingPairsAssociatedWithMatchingPair(mensMatches, 
+                        nm2GeneratingPairs(mensMatches, nm1Pairs))));
+        Set<Index> nmPairs = nmPairs(mensMatches, nm1Pairs, nm2Pairs);
 
         int[] perm = new int[prefs.n()];
         Arrays.fill(perm, -1);
-        for (Index nmPair : nmPairsImpl.get(mensMatches))
+        for (Index nmPair : nmPairs)
             perm[nmPair.y()] = nmPair.x();
         for (int y = 0; y < prefs.n(); y++)
             if (perm[y] == -1)
@@ -240,10 +240,5 @@ class PII extends PIIBase {
             assert !(y1 != y2 && perm[y1] == perm[y2]);
 
         return new Permutation(perm);
-    });
-
-    @Override
-    public Permutation iterationPhase(Permutation mensMatches) {
-        return iterationPhaseImpl.get(mensMatches);
     }
 }
