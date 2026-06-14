@@ -61,22 +61,37 @@ class Main {
         return count;
     }
 
-    private static boolean f(Prefs prefs) {
-        PII pii = new PII(prefs);
-        Permutation mensMatches = Permutation.identity(prefs.n());
-        int n1 = nUnstablePairs(pii, mensMatches);
+    private static boolean isLatinSquare(Permutation[] prefs) {
+        // We already have that all rows are permutations
+        // Let's check the columns as well
 
-        if (pii.nm2GeneratingGraphImpl.get(mensMatches).size() != 1)
-            return false;
-        Permutation matches2 = pii.iterationPhase(mensMatches);
-        int n2 = nUnstablePairs(pii, matches2);
-        return n1 < n2;
+        // for (Permutation )
+
+        final int n = prefs.length;
+        for (int x = 0; x < n; x++) {
+            boolean[] present = new boolean[n];
+            for (int y = 0; y < n; y++) {
+                if (present[prefs[y].get(x)]) return false; // duplicate
+                present[prefs[y].get(x)] = true;
+            }
+            // we can't be missing any if we don't have duplicates
+        }
+        return true;
     }
 
     public static void main(String[] args) {
-        final int n = 3;
-        productMap(allPrefs(n), () -> allPrefs(n), Prefs::new)
-            .filter(Main::f)
-            .forEach(prefs -> System.out.println(prefs + "\n"));
+        final int n = 4;
+        List<Permutation[]> latinSquares =
+            allPrefs(n).filter(Main::isLatinSquare).toList();
+        Permutation initial = Permutation.identity(n);
+        
+        System.out.println(latinSquares.size() + " latin squares\n");
+        
+        for (Permutation[] malePrefs : latinSquares)
+            for (Permutation[] femalePrefs : latinSquares) {
+                Prefs prefs = new Prefs(malePrefs, femalePrefs);
+                if (new PII(prefs).runOrCycle(initial).isEmpty())
+                    System.out.println(prefs + "\n");
+            }
     }
 }
