@@ -52,50 +52,27 @@ class Main {
         return ts.flatMap(t -> us.get().map(u -> f.apply(t, u)));
     }
 
-    private static int nUnstablePairs(PII pii, Permutation mensMatches) {
-        int count = 0;
-        for (int i = 0; i < pii.prefs.n(); i++)
-            for (int j = 0; j < pii.prefs.n(); j++)
-                if (pii.isUnstablePair(mensMatches, i, j))
-                    count++;
-        return count;
-    }
-
-    private static boolean isLatinSquare(Permutation[] prefs) {
-        // We already have that all rows are permutations
-        // Let's check the columns as well
-
-        // for (Permutation )
-
-        final int n = prefs.length;
-        for (int x = 0; x < n; x++) {
-            boolean[] present = new boolean[n];
-            for (int y = 0; y < n; y++) {
-                if (present[prefs[y].get(x)]) return false; // duplicate
-                present[prefs[y].get(x)] = true;
-            }
-            // we can't be missing any if we don't have duplicates
-        }
-        return true;
-    }
+    private static long cyclingCount = 0;
 
     public static void main(String[] args) {
-        final int n = 4;
-        List<Permutation[]> latinSquares =
-            allPrefs(n).filter(Main::isLatinSquare).toList();
+        // Search over the entire state space. Only really possible for n <= 4, and n = 4 requires a lot of compute
+        final int n = 3;
+
+        // Split up the work by having each Java process work on a chunk of the male preferences
+        final int chunkSize = Integer.parseInt(args[0]);
+        final int processID = Integer.parseInt(args[1]);
+
+        System.out.println("chunk_size = " + chunkSize + "; process_id = " + processID);
+
+        Stream<Permutation[]> malePrefs = allPrefs(n).skip((long)chunkSize * processID).limit(chunkSize);
+        Supplier<Stream<Permutation[]>> allFemalePrefs = () -> allPrefs(n);
+        Stream<Prefs> allPrefs = productMap(malePrefs, allFemalePrefs, Prefs::new);
         Permutation initial = Permutation.identity(n);
-        
-        System.out.println(latinSquares.size() + " latin squares\n");
-        
-        int count = 0;
-        for (Permutation[] malePrefs : latinSquares)
-            for (Permutation[] femalePrefs : latinSquares) {
-                Prefs prefs = new Prefs(malePrefs, femalePrefs);
-                if (new PII(prefs).runOrCycle(initial).isEmpty()) {
-                    System.out.println(prefs + "\n");
-                    count++;
-                }
-            }
-        System.out.println("count: " + count);
+        Stream<Prefs> cycling = allPrefs.filter(p -> new PII(p).runOrCycle(initial).isEmpty());
+        cycling.forEach(prefs -> {
+            System.out.println(prefs + "\n");
+            cyclingCount++;
+        });
+        System.out.println("Count: " + cyclingCount);
     }
 }
