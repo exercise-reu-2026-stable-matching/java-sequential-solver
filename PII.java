@@ -11,39 +11,6 @@ class PII extends PIIBase {
         super(prefs);
     }
 
-    List<Index> nm1GeneratingPairs(Permutation mensMatches) {
-        checkPermLength(mensMatches);
-
-        List<Index> out = new ArrayList<>();
-        for (int y = 0; y < prefs.n(); y++) { // men
-            final Permutation row = prefs.malePrefs()[y];
-            int idxOfMinLeftValue = -1;
-            for (int x = 0; x < prefs.n(); x++) { // women
-                if (isUnstablePair(mensMatches, y, x) && (idxOfMinLeftValue == -1 || row.get(x) < row.get(idxOfMinLeftValue)))
-                    idxOfMinLeftValue = x;
-            }
-            if (idxOfMinLeftValue != -1)
-                out.add(new Index(y, idxOfMinLeftValue));
-        }
-        return out;
-    }
-
-    List<Index> nm1Pairs(Permutation mensMatches, List<Index> nm1GeneratingPairs) {
-        checkPermLength(mensMatches);
-
-        // this is pretty inefficient but it's easy to understand
-        Map<Integer, Integer> generatingRowsOfCols = new HashMap<>();
-        for (Index i : nm1GeneratingPairs) {
-            int y2 = generatingRowsOfCols.getOrDefault(i.x(), -1);
-            if (y2 == -1 || prefs.femalePrefs(i.x(), i.y()) < prefs.femalePrefs(i.x(), y2))
-                generatingRowsOfCols.put(i.x(), i.y());
-        }
-        List<Index> out = new ArrayList<>();
-        for (var e : generatingRowsOfCols.entrySet())
-            out.add(new Index(e.getValue(), e.getKey()));
-        return out;
-    }
-
     /** Return a map from an nm1-pair to its corresponding nm2-generating pair. This map is injective */
     static Map<Index, Index> nm2GeneratingPairs(Permutation mensMatches, List<Index> nm1Pairs) {
         Map<Index, Index> out = new HashMap<>();

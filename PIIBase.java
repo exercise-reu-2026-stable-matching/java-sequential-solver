@@ -16,27 +16,6 @@ abstract class PIIBase {
 
     abstract Permutation iterationPhase(Permutation mensMatches);
 
-    boolean isUnstablePair(Permutation mensMatches, int y, int x) {
-        int matchedWoman = mensMatches.get(y);
-        int matchedMan = mensMatches.getInverse(x);
-        // Do y and x prefer to cheat with each other
-        return (prefs.malePrefs(y, x) < prefs.malePrefs(y, matchedWoman)
-             && prefs.femalePrefs(x, y) < prefs.femalePrefs(x, matchedMan));
-    }
-
-    void checkPermLength(Permutation mensMatches) {
-        if (mensMatches.size() != prefs.n())
-            throw new RuntimeException("Wrong size for permutation");
-    }
-
-    boolean isStableMatching(Permutation mensMatches) {
-        for (int y = 0; y < prefs.n(); y++) 
-            for (int x = 0; x < prefs.n(); x++)
-                if (isUnstablePair(mensMatches, y, x))
-                    return false;
-        return true;
-    }
-
     final Pair<Permutation, Boolean> runOne(int c, Random rng) {
         Permutation initial = initiationPhase(rng);
         return runOne(c, initial);
