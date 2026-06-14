@@ -68,7 +68,8 @@ class Main {
         Supplier<Stream<Permutation[]>> allFemalePrefs = () -> allPrefs(n);
         Stream<Prefs> allPrefs = productMap(malePrefs, allFemalePrefs, Prefs::new);
         Permutation initial = Permutation.identity(n);
-        Stream<Prefs> cycling = allPrefs.filter(p -> new PII(p).runOrCycle(initial).isEmpty());
+        PII pii = new PII();
+        Stream<Prefs> cycling = allPrefs.filter(p -> pii.runOrCycle(p, initial).isEmpty());
         cycling.forEach(prefs -> {
             System.out.println(prefs + "\n");
             cyclingCount++;

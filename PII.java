@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,10 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 class PII extends PIIBase {
-    PII(Prefs prefs) {
-        super(prefs);
-    }
-
     /** Return a map from an nm1-pair to its corresponding nm2-generating pair. This map is injective */
     static Map<Index, Index> nm2GeneratingPairs(Permutation mensMatches, List<Index> nm1Pairs) {
         Map<Index, Index> out = new HashMap<>();
@@ -201,10 +196,10 @@ class PII extends PIIBase {
     }
 
     @Override
-    public Permutation iterationPhase(Permutation mensMatches) {
-        checkPermLength(mensMatches);
+    public Permutation iterationPhase(Prefs prefs, Permutation mensMatches) {
+        prefs.checkPermLength(mensMatches);
 
-        List<Index> nm1Pairs = nm1Pairs(mensMatches, nm1GeneratingPairs(mensMatches));
+        List<Index> nm1Pairs = prefs.nm1Pairs(mensMatches, prefs.nm1GeneratingPairs(mensMatches));
         return iterationPhase(mensMatches, nm1Pairs);
     }
 }
