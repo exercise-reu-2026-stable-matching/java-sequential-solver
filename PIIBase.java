@@ -14,7 +14,15 @@ abstract class PIIBase {
         return Permutation.random(rng, prefs.n());
     }
 
-    abstract Permutation iterationPhase(Permutation mensMatches);
+    /** Given the identity permutation (men's matches) as input, compute the next permutation after one PII iteration.
+      * This function should respect composition, so that the
+      * other overload satisfies iterationPhase(p \circ q) = p \circ iterationPhase(q) for all permutations p. */
+    abstract Permutation iterationPhase();
+
+    /** Given the men's matches as input, compute the next permutation after one PII iteration */
+    Permutation iterationPhase(Permutation mensMatches) {
+        return mensMatches.compose(iterationPhase());
+    }
 
     boolean isUnstablePair(Permutation mensMatches, int y, int x) {
         int matchedWoman = mensMatches.get(y);

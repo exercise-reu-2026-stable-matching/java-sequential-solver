@@ -4,7 +4,7 @@ class CPII extends PIIBase {
     }
 
     @Override
-    Permutation iterationPhase(Permutation mensMatches) {
+    Permutation iterationPhase() {
         throw new RuntimeException("not implemented"); // TODO
     }
 }

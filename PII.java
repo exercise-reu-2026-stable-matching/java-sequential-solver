@@ -213,7 +213,7 @@ class PII extends PIIBase {
     };
 
     @Override
-    public Permutation iterationPhase(Permutation mensMatches) {
+    Permutation iterationPhase(Permutation mensMatches) {
         checkPermLength(mensMatches);
 
         List<Index> nm1Pairs = nm1Pairs(mensMatches, nm1GeneratingPairs(mensMatches));
@@ -238,5 +238,10 @@ class PII extends PIIBase {
             assert !(y1 != y2 && perm[y1] == perm[y2]);
 
         return new Permutation(perm);
+    }
+
+    @Override
+    Permutation iterationPhase() {
+        return iterationPhase(Permutation.identity(prefs.n()));
     }
 }
