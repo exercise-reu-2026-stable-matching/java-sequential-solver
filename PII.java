@@ -149,7 +149,7 @@ class PII extends PIIBase {
     }
 
     /** Returns the nm2-pair from the row end and column end of a chain; otherwise `null` for cycles */
-    private Index nm2PairFromChain(Permutation mensMatches, Index start, Map<Index, Edges> nm2GeneratingGraph) {
+    private Index nm2PairFromChain(Index start, Map<Index, Edges> nm2GeneratingGraph) {
         Index rEnd = null;
         for (Index curr = start; ; ) {
             Index next = nm2GeneratingGraph.get(curr).rPtr;
@@ -190,7 +190,7 @@ class PII extends PIIBase {
 
         // This does a ton of extra work TODO
         for (Index nm2GeneratingPair : nm2GeneratingGraph.keySet()) {
-            Index nm2Pair = nm2PairFromChain(mensMatches, nm2GeneratingPair, nm2GeneratingGraph);
+            Index nm2Pair = nm2PairFromChain(nm2GeneratingPair, nm2GeneratingGraph);
             if (nm2Pair != null)
                 out.add(nm2Pair);
         }
