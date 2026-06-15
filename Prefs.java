@@ -157,4 +157,29 @@ record Prefs(Permutation[] malePrefs, Permutation[] femalePrefs) {
         return out;
     }
 
+    /** The permutation that, when applied to the columns of `femalePrefs` (rows in the paper's presentation), yields the identity permutation
+     * in the first row.
+     */
+    Permutation permToFemaleSorted() {
+        if (n() == 0)
+            return Permutation.identity(0);
+        return femalePrefs[0].invert();
+    }
+
+    /** Apply `p` to the rows of the preference matrix of pairs, i.e. apply `p` to the order that the rows of `malePrefs`
+     * appear (each individual row is unchanged) and, likewise, the order of the columns of `femalePrefs`. Equivalently,
+     * we relabel the men everywhere.
+     */
+    Prefs applyPerm(Permutation p) {
+        Permutation[] malePrefs2 = new Permutation[n()];
+        // let f = malePrefs
+        for (int y = 0; y < n(); y++)
+            malePrefs2[p.get(y)] = malePrefs[y]; // send p(y) to f(y)
+        Permutation[] femalePrefs2 = new Permutation[n()];
+        for (int x = 0; x < n(); x++)
+            femalePrefs2[x] = p.compose(femalePrefs[x]); // send (x := f(y)) to p(y)
+
+        return new Prefs(malePrefs2, femalePrefs2);
+    }
+
 }
