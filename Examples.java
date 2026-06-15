@@ -91,4 +91,21 @@ class Examples {
         };
         cpiiExample = new Prefs(malePrefs, femalePrefs);
     }
+
+    public static final Prefs cpiiExample2;
+    static {
+        int[][] malePrefs = {
+            { 2, 3, 1, 4 },
+            { 3, 2, 1, 4 },
+            { 3, 4, 1, 2 },
+            { 4, 1, 2, 3 }
+        };
+        int[][] femalePrefs = {
+            { 4, 3, 2, 1 },
+            { 2, 1, 3, 4 },
+            { 2, 1, 4, 3 },
+            { 3, 1, 4, 2 }
+        };
+        cpiiExample2 = new Prefs(malePrefs, femalePrefs);
+    }
 }

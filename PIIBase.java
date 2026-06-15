@@ -26,16 +26,18 @@ abstract class PIIBase {
         return new Pair<>(curr, prefs.isStableMatching(curr));
     }
 
-    public final Optional<Permutation> runOrCycle(Prefs prefs, Permutation initial) {
+    public final Pair<Optional<Permutation>, Integer> runOrCycle(Prefs prefs, Permutation initial) {
         Permutation curr = initial;
         Set<Permutation> visited = new HashSet<>();
 
+        int iters = 0;
         while (!prefs.isStableMatching(curr)) {
-            if (visited.contains(curr)) return Optional.empty();
+            if (visited.contains(curr)) return new Pair<>(Optional.empty(), iters);
             visited.add(curr);
             curr = iterationPhase(prefs, curr);
+            iters++;
         }
-        return Optional.of(curr);
+        return new Pair<>(Optional.of(curr), iters);
     }
 
     /** Keep running `runOne` until a stable matching is found */

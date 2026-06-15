@@ -14,6 +14,10 @@ class Permutation {
         this.perm = perm;
         this.inversePerm = inversePerm;
     }
+
+    static Permutation allUnmatched(int n) {
+        return new Permutation(CPII.allUnmatched(n), CPII.allUnmatched(n));
+    }
     
     Permutation(int[] perm) {
         this.perm = perm;

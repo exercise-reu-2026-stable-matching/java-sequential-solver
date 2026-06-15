@@ -107,8 +107,9 @@ record Prefs(Permutation[] malePrefs, Permutation[] femalePrefs) {
         int matchedWoman = mensMatches.get(y);
         int matchedMan = mensMatches.getInverse(x);
         // Do y and x prefer to cheat with each other
-        return (malePrefs(y, x) < malePrefs(y, matchedWoman)
-             && femalePrefs(x, y) < femalePrefs(x, matchedMan));
+        // HACK to get CPII to work
+        return ((matchedWoman == -1 || malePrefs(y, x) < malePrefs(y, matchedWoman))
+             && (matchedMan == -1 || femalePrefs(x, y) < femalePrefs(x, matchedMan)));
     }
 
     boolean isStableMatching(Permutation mensMatches) {

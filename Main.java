@@ -1,5 +1,6 @@
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -52,16 +53,41 @@ class Main {
         return ts.flatMap(t -> us.get().map(u -> f.apply(t, u)));
     }
 
-    private static long cyclingCount = 0;
+    static Pair<Boolean, Integer> countCycles(PIIBase pii, Prefs prefs, Permutation init) {
+        var result = pii.runOrCycle(prefs, init);
+        return new Pair<>(result.fst().isPresent(), result.snd());
+    }
 
     public static void main(String[] args) {
-        Prefs prefs = Examples.cpiiExample;
+        Random rng = new Random(1);
+        final int nIters = Integer.parseInt(args[0]);
+        final int nSize  = Integer.parseInt(args[1]);
+        PII pii = new PII();
         CPII cpii = new CPII();
-        Permutation matching = cpii.initiationPhase(prefs.n());
-        while (!CPII.isStableMatching(prefs, matching)) {
-            System.out.println(matching);
-            matching = cpii.iterationPhase(prefs, matching);
+
+        System.out.println("pii_converged,pii_diverged,pii_converged_total_iters,pii_diverged_total_iters,cpii_total_iters");
+        Permutation identity = Permutation.identity(nSize);
+        Permutation empty = Permutation.allUnmatched(nSize);
+
+        long nPIIConverging = 0, nItersForPIIOfConverging = 0, nItersForPIIOfDiverging = 0,
+             nItersForCPII = 0;
+
+        for (int i = 0; i < nIters; i++) {
+            Prefs prefs = Prefs.random(rng, nSize);
+            var piiResult = countCycles(pii, prefs, identity);
+            var cpiiResult = countCycles(cpii, prefs, empty);
+
+            if (piiResult.fst()) {
+                nPIIConverging++;
+                nItersForPIIOfConverging += piiResult.snd();
+            } else
+                nItersForPIIOfDiverging += piiResult.snd();
+
+            assert cpiiResult.fst() : prefs;
+            nItersForCPII += cpiiResult.snd();
         }
-        System.out.println(matching);
+
+        System.out.printf("%d,%d,%d,%d,%d\n", 
+            nPIIConverging, nIters - nPIIConverging, nItersForPIIOfConverging, nItersForPIIOfDiverging, nItersForCPII);
     }
 }

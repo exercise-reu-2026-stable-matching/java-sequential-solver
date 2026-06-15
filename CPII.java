@@ -3,7 +3,7 @@ import java.util.Arrays;
 class CPII extends PIIBase {
     private static final int UNMATCHED = -1;
 
-    private static int[] allUnmatched(int n) {
+    static int[] allUnmatched(int n) {
         int[] out = new int[n];
         Arrays.fill(out, UNMATCHED);
         return out;
@@ -21,6 +21,8 @@ class CPII extends PIIBase {
         int matchedWoman = mensMatches.get(y);
         int matchedMan = mensMatches.getInverse(x);
 
+        // System.out.printf("matchedWoman=%d, matchedMan=%d\n", matchedWoman, matchedMan);
+
         return (matchedWoman == UNMATCHED || prefs.malePrefs(y, x)   < prefs.malePrefs(y, matchedWoman)) 
             && (matchedMan == UNMATCHED   || prefs.femalePrefs(x, y) < prefs.femalePrefs(x, matchedMan));
     }
@@ -33,6 +35,7 @@ class CPII extends PIIBase {
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < n; x++) {
                 if (isUnstablePair(prefs, mensMatches, y, x)) {
+                    // System.out.printf("y=%d, x=%d unstable\n", y, x);
                     int oldX = out[y];
                     if (oldX == UNMATCHED || prefs.malePrefs(y, x) < prefs.malePrefs(y, oldX))
                         out[y] = x;
@@ -74,9 +77,9 @@ class CPII extends PIIBase {
     @Override
     Permutation iterationPhase(Prefs prefs, Permutation ks) {
         int[] bs = maleDominantUnstablePairs(prefs, ks);
-        System.out.println("bs: " + Arrays.toString(bs));
+        // System.out.println("bs: " + Arrays.toString(bs));
         int[] cs = maleFemaleDominantUnstablePairs(prefs, bs);
-        System.out.println("cs: " + Arrays.toString(cs));
+        // System.out.println("cs: " + Arrays.toString(cs));
         
         final int n = prefs.n();
         // start totally empty
