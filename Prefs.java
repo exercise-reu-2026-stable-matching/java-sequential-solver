@@ -34,7 +34,7 @@ record Prefs(Permutation[] malePrefs, Permutation[] femalePrefs) {
 
     @Override 
     public int hashCode() {
-        return Objects.hash(Arrays.hashCode(malePrefs));
+        return Objects.hash(Arrays.hashCode(malePrefs), Arrays.hashCode(femalePrefs));
     }
 
     private static int[] decrement(int[] arr) {
