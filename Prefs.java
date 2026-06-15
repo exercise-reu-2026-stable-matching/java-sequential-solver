@@ -1,4 +1,8 @@
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
@@ -97,6 +101,60 @@ record Prefs(Permutation[] malePrefs, Permutation[] femalePrefs) {
                 sb.append("\n");
         }
         return sb.toString();
+    }
+
+    boolean isUnstablePair(Permutation mensMatches, int y, int x) {
+        int matchedWoman = mensMatches.get(y);
+        int matchedMan = mensMatches.getInverse(x);
+        // Do y and x prefer to cheat with each other
+        return (malePrefs(y, x) < malePrefs(y, matchedWoman)
+             && femalePrefs(x, y) < femalePrefs(x, matchedMan));
+    }
+
+    boolean isStableMatching(Permutation mensMatches) {
+        for (int y = 0; y < n(); y++) 
+            for (int x = 0; x < n(); x++)
+                if (isUnstablePair(mensMatches, y, x))
+                    return false;
+        return true;
+    }
+
+    void checkPermLength(Permutation mensMatches) {
+        if (mensMatches.size() != n())
+            throw new RuntimeException("Wrong size for permutation");
+    }
+
+    List<Index> nm1GeneratingPairs(Permutation mensMatches) {
+        checkPermLength(mensMatches);
+
+        List<Index> out = new ArrayList<>();
+        for (int y = 0; y < n(); y++) { // men
+            final Permutation row = malePrefs[y];
+            int idxOfMinLeftValue = -1;
+            for (int x = 0; x < n(); x++) { // women
+                if (isUnstablePair(mensMatches, y, x) && (idxOfMinLeftValue == -1 || row.get(x) < row.get(idxOfMinLeftValue)))
+                    idxOfMinLeftValue = x;
+            }
+            if (idxOfMinLeftValue != -1)
+                out.add(new Index(y, idxOfMinLeftValue));
+        }
+        return out;
+    }
+
+    List<Index> nm1Pairs(Permutation mensMatches, List<Index> nm1GeneratingPairs) {
+        checkPermLength(mensMatches);
+
+        // this is pretty inefficient but it's easy to understand
+        Map<Integer, Integer> generatingRowsOfCols = new HashMap<>();
+        for (Index i : nm1GeneratingPairs) {
+            int y2 = generatingRowsOfCols.getOrDefault(i.x(), -1);
+            if (y2 == -1 || femalePrefs(i.x(), i.y()) < femalePrefs(i.x(), y2))
+                generatingRowsOfCols.put(i.x(), i.y());
+        }
+        List<Index> out = new ArrayList<>();
+        for (var e : generatingRowsOfCols.entrySet())
+            out.add(new Index(e.getValue(), e.getKey()));
+        return out;
     }
 
 }
