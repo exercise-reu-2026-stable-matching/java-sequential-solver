@@ -55,25 +55,13 @@ class Main {
     private static long cyclingCount = 0;
 
     public static void main(String[] args) {
-        // Search over the entire state space. Only really possible for n <= 4, and n = 4 requires a lot of compute
-        final int n = 4;
-
-        // Split up the work by having each Java process work on a chunk of the male preferences
-        final int chunkSize = Integer.parseInt(args[0]);
-        final int processID = Integer.parseInt(args[1]);
-
-        System.out.println("chunkSize = " + chunkSize + "; processID = " + processID);
-
-        Stream<Permutation[]> malePrefs = allPrefs(n).skip((long)chunkSize * processID).limit(chunkSize);
-        Supplier<Stream<Permutation[]>> allFemalePrefs = () -> allPrefs(n);
-        Stream<Prefs> allPrefs = productMap(malePrefs, allFemalePrefs, Prefs::new);
-        Permutation initial = Permutation.identity(n);
-        PII pii = new PII();
-        Stream<Prefs> cycling = allPrefs.filter(p -> pii.runOrCycle(p, initial).isEmpty());
-        cycling.forEach(prefs -> {
-            System.out.println(prefs + "\n");
-            cyclingCount++;
-        });
-        System.out.println("Count: " + cyclingCount);
+        Prefs prefs = Examples.cpiiExample;
+        CPII cpii = new CPII();
+        Permutation matching = cpii.initiationPhase(null, prefs.n());
+        while (!CPII.isStableMatching(prefs, matching)) {
+            System.out.println(matching);
+            matching = cpii.iterationPhase(prefs, matching);
+        }
+        System.out.println(matching);
     }
 }

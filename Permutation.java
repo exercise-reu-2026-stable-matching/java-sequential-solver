@@ -7,10 +7,25 @@ import java.util.stream.Stream;
 class Permutation {
     private final int[] perm;
     private final int[] inversePerm;
+
+    // TODO encapsulate, worry about invariant, etc.
+    /** Record constructor, no checks */
+    Permutation(int[] perm, int[] inversePerm) {
+        this.perm = perm;
+        this.inversePerm = inversePerm;
+    }
     
     Permutation(int[] perm) {
         this.perm = perm;
 
+        checkPermInv(perm);
+
+        this.inversePerm = new int[perm.length];
+        for (int i = 0; i < perm.length; i++)
+            inversePerm[perm[i]] = i;
+    }
+
+    private static void checkPermInv(int[] perm) {
         // make sure it's a bijection
         boolean[] present = new boolean[perm.length];
         for (int y : perm) {
@@ -23,10 +38,6 @@ class Permutation {
         for (int y = 0; y < perm.length; y++)
             if (!present[y])
                 throw new RuntimeException("Missing " + y);
-
-        this.inversePerm = new int[perm.length];
-        for (int i = 0; i < perm.length; i++)
-            inversePerm[perm[i]] = i;
     }
     
     /** `n` */

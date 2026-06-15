@@ -74,4 +74,21 @@ class Examples {
             new Prefs(malePrefs, femalePrefs),
             new Permutation(new int[]{ 1, 7, 3, 0, 5, 6, 9, 8, 4, 2 }));
     }
+
+    public static final Prefs cpiiExample;
+    static {
+        int[][] malePrefs = {
+            { 1, 2, 4, 3 },
+            { 4, 1, 2, 3 },
+            { 2, 1, 3, 4 },
+            { 1, 2, 3, 4 }
+        };
+        int[][] femalePrefs = {
+            { 3, 1, 2, 4 },
+            { 1, 2, 3, 4 },
+            { 1, 3, 4, 2 },
+            { 1, 2, 4, 3 }
+        };
+        cpiiExample = new Prefs(malePrefs, femalePrefs);
+    }
 }
