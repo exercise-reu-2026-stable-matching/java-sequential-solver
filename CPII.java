@@ -1,5 +1,4 @@
 import java.util.Arrays;
-import java.util.Random;
 
 class CPII extends PIIBase {
     private static final int UNMATCHED = -1;
@@ -11,7 +10,7 @@ class CPII extends PIIBase {
     }
 
     @Override
-    Permutation initiationPhase(Random rng, int n) {
+    Permutation initiationPhase(int n) {
         return new Permutation(allUnmatched(n), allUnmatched(n));
     }
 

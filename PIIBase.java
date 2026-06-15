@@ -1,17 +1,14 @@
 import java.util.HashSet;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
 
 abstract class PIIBase {
-    Permutation initiationPhase(Random rng, int n) {
-        return Permutation.random(rng, n);
-    }
+    abstract Permutation initiationPhase(int n);
 
     abstract Permutation iterationPhase(Prefs prefs, Permutation mensMatches);
 
-    final Pair<Permutation, Boolean> runOne(int c, Random rng, Prefs prefs) {
-        Permutation initial = initiationPhase(rng, prefs.n());
+    final Pair<Permutation, Boolean> runOne(int c, Prefs prefs) {
+        Permutation initial = initiationPhase(prefs.n());
         return runOne(c, prefs, initial);
     }
 
@@ -42,10 +39,10 @@ abstract class PIIBase {
     }
 
     /** Keep running `runOne` until a stable matching is found */
-    public final Permutation run(int c, Random rng, Prefs prefs) {
+    public final Permutation run(int c, Prefs prefs) {
         Pair<Permutation, Boolean> res;
         do {
-            res = runOne(c, rng, prefs);
+            res = runOne(c, prefs);
         } while (!res.snd());
         return res.fst();
     }

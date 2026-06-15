@@ -3,9 +3,25 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 class PII extends PIIBase {
+    private final Random rng;
+
+    PII(Random rng) {
+        this.rng = rng;
+    }
+
+    PII() {
+        this.rng = new Random();
+    }
+
+    @Override
+    Permutation initiationPhase(int n) {
+        return Permutation.random(rng, n);
+    }
+
     /** Return a map from an nm1-pair to its corresponding nm2-generating pair. This map is injective */
     static Map<Index, Index> nm2GeneratingPairs(Permutation mensMatches, List<Index> nm1Pairs) {
         Map<Index, Index> out = new HashMap<>();

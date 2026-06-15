@@ -57,7 +57,7 @@ class Main {
     public static void main(String[] args) {
         Prefs prefs = Examples.cpiiExample;
         CPII cpii = new CPII();
-        Permutation matching = cpii.initiationPhase(null, prefs.n());
+        Permutation matching = cpii.initiationPhase(prefs.n());
         while (!CPII.isStableMatching(prefs, matching)) {
             System.out.println(matching);
             matching = cpii.iterationPhase(prefs, matching);
