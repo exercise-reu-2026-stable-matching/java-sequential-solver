@@ -61,12 +61,23 @@ class CPII extends PIIBase {
 
         return out;
     }
+
+    static boolean isStableMatching(Prefs prefs, Permutation ks) {
+        for (int y = 0; y < prefs.n(); y++) {
+            int x = ks.get(y);
+            if (x == UNMATCHED || isUnstablePair(prefs, ks, y, x)) 
+                return false;
+        }
+        return true;
+    }
     
     // ks is like mensMatches
     @Override
     Permutation iterationPhase(Prefs prefs, Permutation ks) {
         int[] bs = maleDominantUnstablePairs(prefs, ks);
+        System.out.println("bs: " + Arrays.toString(bs));
         int[] cs = maleFemaleDominantUnstablePairs(prefs, ks, bs);
+        System.out.println("cs: " + Arrays.toString(cs));
         
         final int n = prefs.n();
         // start totally empty
@@ -84,8 +95,9 @@ class CPII extends PIIBase {
 
         // add each element of K_i as long as it doesn't share a member with a pair in C_i
         for (int y = 0; y < n; y++) {
-            if (nextMatches[y] == UNMATCHED) {
-                int x = ks.get(y);
+            int x = ks.get(y);
+            if (x == UNMATCHED) continue;
+            if (nextMatches[y] == UNMATCHED && nextMatchesInv[x] == UNMATCHED) {
                 nextMatches[y] = x;
                 assert nextMatchesInv[x] == UNMATCHED;
                 nextMatchesInv[x] = y;
