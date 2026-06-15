@@ -1,3 +1,7 @@
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -5,6 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 record Prefs(Permutation[] malePrefs, Permutation[] femalePrefs) {
     
@@ -180,6 +187,58 @@ record Prefs(Permutation[] malePrefs, Permutation[] femalePrefs) {
             femalePrefs2[x] = p.compose(femalePrefs[x]); // send (x := f(y)) to p(y)
 
         return new Prefs(malePrefs2, femalePrefs2);
+    }
+
+    // VIBE-CODED
+
+    private static final Pattern NUM = Pattern.compile("\\d+");
+
+    /** Parse every `.out` file in `dir` (the inverse of {@link #toString()}) into a stream of `Prefs`. */
+    static Stream<Prefs> parseOutDir(Path dir) {
+        try {
+            return Files.list(dir)
+                .filter(p -> p.toString().endsWith(".out"))
+                .flatMap(Prefs::parseOutFile);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private static Stream<Prefs> parseOutFile(Path file) {
+        try {
+            List<Prefs> out = new ArrayList<>();
+            List<String> block = new ArrayList<>();
+            for (String line : Files.readAllLines(file)) {
+                if (line.startsWith("(")) {
+                    block.add(line);
+                } else if (!block.isEmpty()) {
+                    out.add(parseBlock(block));
+                    block = new ArrayList<>();
+                }
+            }
+            if (!block.isEmpty())
+                out.add(parseBlock(block));
+            return out.stream();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    /** Each row `y` is `(malePrefs(y, x) + 1, femalePrefs(x, y) + 1)` for `x` in `[0, n)`. */
+    private static Prefs parseBlock(List<String> rows) {
+        int n = rows.size();
+        int[][] malePrefs = new int[n][n];
+        int[][] femalePrefs = new int[n][n];
+        for (int y = 0; y < n; y++) {
+            Matcher m = NUM.matcher(rows.get(y));
+            for (int x = 0; x < n; x++) {
+                m.find();
+                malePrefs[y][x] = Integer.parseInt(m.group());
+                m.find();
+                femalePrefs[x][y] = Integer.parseInt(m.group());
+            }
+        }
+        return new Prefs(malePrefs, femalePrefs);
     }
 
 }
