@@ -63,9 +63,9 @@ class CPII extends PIIBase {
 
     static boolean isStableMatching(Prefs prefs, Permutation ks) {
         for (int y = 0; y < prefs.n(); y++) {
-            int x = ks.get(y);
-            if (x == UNMATCHED || isUnstablePair(prefs, ks, y, x)) 
-                return false;
+            for (int x = 0; x < prefs.n(); x++)
+                if (isUnstablePair(prefs, ks, y, x))
+                    return false;
         }
         return true;
     }
