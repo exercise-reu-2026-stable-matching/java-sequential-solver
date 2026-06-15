@@ -45,7 +45,7 @@ class CPII extends PIIBase {
 
     /** Return the male-female-dominant unstable pair for each column, or -1 if no such pair exists.
      */
-    private static int[] maleFemaleDominantUnstablePairs(Prefs prefs, Permutation mensMatches, int[] maleDominantUnstablePairs) {
+    private static int[] maleFemaleDominantUnstablePairs(Prefs prefs, int[] maleDominantUnstablePairs) {
         final int n = prefs.n();
         int[] out = allUnmatched(n); // by column
 
@@ -75,7 +75,7 @@ class CPII extends PIIBase {
     Permutation iterationPhase(Prefs prefs, Permutation ks) {
         int[] bs = maleDominantUnstablePairs(prefs, ks);
         System.out.println("bs: " + Arrays.toString(bs));
-        int[] cs = maleFemaleDominantUnstablePairs(prefs, ks, bs);
+        int[] cs = maleFemaleDominantUnstablePairs(prefs, bs);
         System.out.println("cs: " + Arrays.toString(cs));
         
         final int n = prefs.n();
