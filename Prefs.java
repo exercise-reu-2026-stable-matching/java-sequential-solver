@@ -1,4 +1,6 @@
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,6 +14,7 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import java.util.zip.GZIPInputStream;
 
 record Prefs(Permutation[] malePrefs, Permutation[] femalePrefs) {
     
@@ -193,11 +196,13 @@ record Prefs(Permutation[] malePrefs, Permutation[] femalePrefs) {
 
     private static final Pattern NUM = Pattern.compile("\\d+");
 
-    /** Parse every `.out` file in `dir` (the inverse of {@link #toString()}) into a stream of `Prefs`. */
+    /** Parse every gzipped `.out.gz` file in `dir` (the inverse of {@link #toString()}) into a stream of `Prefs`,
+     * decompressing each file on the fly so they never need to be unzipped to disk.
+     */
     static Stream<Prefs> parseOutDir(Path dir) {
         try {
             return Files.list(dir)
-                .filter(p -> p.toString().endsWith(".out"))
+                .filter(p -> p.toString().endsWith(".out.gz"))
                 .flatMap(Prefs::parseOutFile);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -205,10 +210,12 @@ record Prefs(Permutation[] malePrefs, Permutation[] femalePrefs) {
     }
 
     private static Stream<Prefs> parseOutFile(Path file) {
-        try {
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(new GZIPInputStream(Files.newInputStream(file))))) {
             List<Prefs> out = new ArrayList<>();
             List<String> block = new ArrayList<>();
-            for (String line : Files.readAllLines(file)) {
+            String line;
+            while ((line = reader.readLine()) != null) {
                 if (line.startsWith("(")) {
                     block.add(line);
                 } else if (!block.isEmpty()) {
