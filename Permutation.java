@@ -53,6 +53,10 @@ class Permutation {
         return inversePerm[index];
     }
 
+    Permutation invert() {
+        return new Permutation(inversePerm, perm);
+    }
+
     static Permutation random(Random rng, int n) {
         int[] out = new int[n];
         // Fisher-Yates shuffle
