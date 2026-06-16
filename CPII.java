@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 class CPII extends PIIBase {
     private static final int UNMATCHED = -1;
@@ -14,7 +16,7 @@ class CPII extends PIIBase {
         return new Permutation(allUnmatched(n), allUnmatched(n));
     }
 
-    private static boolean isUnstablePair(Prefs prefs, Permutation mensMatches, int y, int x) {
+    static boolean isUnstablePair(Prefs prefs, Permutation mensMatches, int y, int x) {
         assert y != UNMATCHED;
         assert x != UNMATCHED;
 
@@ -27,8 +29,22 @@ class CPII extends PIIBase {
             && (matchedMan == UNMATCHED   || prefs.femalePrefs(x, y) < prefs.femalePrefs(x, matchedMan));
     }
 
+    static List<Index> unstablePairs(Prefs prefs, Permutation mensMatches) {
+        final int n = prefs.n();
+        List<Index> out = new ArrayList<>();
+
+        for (int y = 0; y < n; y++) {
+            for (int x = 0; x < n; x++) {
+                if (isUnstablePair(prefs, mensMatches, y, x))
+                    out.add(new Index(y, x));
+            }
+        }
+
+        return out;
+    }
+
     /** Return the male-dominant unstable pair for each row, or -1 if no such pair exists */
-    private static int[] maleDominantUnstablePairs(Prefs prefs, Permutation mensMatches) {
+    static int[] maleDominantUnstablePairs(Prefs prefs, Permutation mensMatches) {
         final int n = prefs.n();
         int[] out = allUnmatched(n);
 
@@ -48,7 +64,7 @@ class CPII extends PIIBase {
 
     /** Return the male-female-dominant unstable pair for each column, or -1 if no such pair exists.
      */
-    private static int[] maleFemaleDominantUnstablePairs(Prefs prefs, int[] maleDominantUnstablePairs) {
+    static int[] maleFemaleDominantUnstablePairs(Prefs prefs, int[] maleDominantUnstablePairs) {
         final int n = prefs.n();
         int[] out = allUnmatched(n); // by column
 
@@ -72,15 +88,9 @@ class CPII extends PIIBase {
         }
         return true;
     }
-    
-    // ks is like mensMatches
-    @Override
-    Permutation iterationPhase(Prefs prefs, Permutation ks) {
-        int[] bs = maleDominantUnstablePairs(prefs, ks);
-        // System.out.println("bs: " + Arrays.toString(bs));
-        int[] cs = maleFemaleDominantUnstablePairs(prefs, bs);
-        // System.out.println("cs: " + Arrays.toString(cs));
-        
+
+    /** Returns the next matching and the overlap count (|R|) */
+    static Pair<Permutation, Integer> iterationPhase(Prefs prefs, Permutation ks, int[] bs, int[] cs) {
         final int n = prefs.n();
         // start totally empty
         int[] nextMatches = allUnmatched(n);
@@ -95,6 +105,7 @@ class CPII extends PIIBase {
             }
         }
 
+        int rCount = 0;
         // add each element of K_i as long as it doesn't share a member with a pair in C_i
         for (int y = 0; y < n; y++) {
             int x = ks.get(y);
@@ -103,9 +114,21 @@ class CPII extends PIIBase {
                 nextMatches[y] = x;
                 assert nextMatchesInv[x] == UNMATCHED;
                 nextMatchesInv[x] = y;
-            }
+            } else
+                rCount++;
         }
 
-        return new Permutation(nextMatches, nextMatchesInv);
+        return new Pair<>(new Permutation(nextMatches, nextMatchesInv), rCount);
+    }
+    
+    // ks is like mensMatches
+    @Override
+    Permutation iterationPhase(Prefs prefs, Permutation ks) {
+        int[] bs = maleDominantUnstablePairs(prefs, ks);
+        // System.out.println("bs: " + Arrays.toString(bs));
+        int[] cs = maleFemaleDominantUnstablePairs(prefs, bs);
+        // System.out.println("cs: " + Arrays.toString(cs));
+        
+        return iterationPhase(prefs, ks, bs, cs).fst();
     }
 }

@@ -58,36 +58,61 @@ class Main {
         return new Pair<>(result.fst().isPresent(), result.snd());
     }
 
+    static int[] mensFavorites(Prefs prefs) {
+        int[] out = new int[prefs.n()];
+        for (int i = 0; i < prefs.n(); i++)
+            out[i] = prefs.malePrefs()[i].getInverse(0);
+        return out;
+    }
+
+    static int countMatches(int[] arr) {
+        int count = 0;
+        for (int x : arr)
+            if (x != -1)
+                count++;
+        return count;
+    }
+
     public static void main(String[] args) {
         Random rng = new Random(1);
-        final int nIters = Integer.parseInt(args[0]);
-        final int nSize  = Integer.parseInt(args[1]);
-        PII pii = new PII();
-        CPII cpii = new CPII();
+        final int nSamples = Integer.parseInt(args[0]);
+        final int nSize    = Integer.parseInt(args[1]);
+        final int nIters   = Integer.parseInt(args[2]);
 
-        System.out.println("pii_converged,pii_diverged,pii_converged_total_iters,pii_diverged_total_iters,cpii_total_iters");
-        Permutation identity = Permutation.identity(nSize);
-        Permutation empty = Permutation.allUnmatched(nSize);
+        // average sizes
+        double[] kSizes = new double[nIters], 
+                 rSizes = new double[nIters], 
+                 aSizes = new double[nIters], 
+                 bSizes = new double[nIters], 
+                 cSizes = new double[nIters];
+        System.out.println("i,|K|,|R|,|A|,|B|,|C|,|K|/n,|R|/n,|A|/n,|B|/n,|C|/n");
 
-        long nPIIConverging = 0, nItersForPIIOfConverging = 0, nItersForPIIOfDiverging = 0,
-             nItersForCPII = 0;
-
-        for (int i = 0; i < nIters; i++) {
+        for (int s = 0; s < nSamples; s++) {
             Prefs prefs = Prefs.random(rng, nSize);
-            var piiResult = countCycles(pii, prefs, identity);
-            var cpiiResult = countCycles(cpii, prefs, empty);
+            Permutation curr = Permutation.allUnmatched(nSize);
+            for (int i = 0; i < nIters; i++) {
+                aSizes[i] += CPII.unstablePairs(prefs, curr).size() / (double)nSamples;
+                
+                int[] bs = CPII.maleDominantUnstablePairs(prefs, curr);
+                int[] cs = CPII.maleFemaleDominantUnstablePairs(prefs, bs);
 
-            if (piiResult.fst()) {
-                nPIIConverging++;
-                nItersForPIIOfConverging += piiResult.snd();
-            } else
-                nItersForPIIOfDiverging += piiResult.snd();
+                bSizes[i] += countMatches(bs) / (double)nSamples;
+                cSizes[i] += countMatches(cs) / (double)nSamples;
 
-            assert cpiiResult.fst() : prefs;
-            nItersForCPII += cpiiResult.snd();
+                Pair<Permutation, Integer> result = CPII.iterationPhase(prefs, curr, bs, cs);
+
+                curr = result.fst();
+
+                rSizes[i] += result.snd() / (double)nSamples;
+                kSizes[i] += countMatches(curr.perm) / (double)nSamples;
+            }
         }
-
-        System.out.printf("%d,%d,%d,%d,%d\n", 
-            nPIIConverging, nIters - nPIIConverging, nItersForPIIOfConverging, nItersForPIIOfDiverging, nItersForCPII);
+        for (int i = 0; i < nIters; i++) {
+            System.out.printf("%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", 
+                i + 1,
+                kSizes[i], rSizes[i], aSizes[i], bSizes[i], cSizes[i],
+                kSizes[i] / nSize, rSizes[i] / nSize, aSizes[i] / nSize, bSizes[i] / nSize, cSizes[i] / nSize
+            );
+        }
     }
 }
