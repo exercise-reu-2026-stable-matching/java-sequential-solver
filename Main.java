@@ -77,21 +77,30 @@ class Main {
         Random rng = new Random(1);
         final int nSamples = Integer.parseInt(args[0]);
         final int nSize    = Integer.parseInt(args[1]);
-        final int nIters   = Integer.parseInt(args[2]);
+        final int maxIters   = Integer.parseInt(args[2]);
 
         // average sizes
-        double[] kSizes = new double[nIters], 
-                 rSizes = new double[nIters], 
-                 aSizes = new double[nIters], 
-                 bSizes = new double[nIters], 
-                 cSizes = new double[nIters];
+        double[] kSizes = new double[maxIters], 
+                 rSizes = new double[maxIters], 
+                 aSizes = new double[maxIters], 
+                 bSizes = new double[maxIters], 
+                 cSizes = new double[maxIters];
         System.out.println("i,|K|,|R|,|A|,|B|,|C|,|K|/n,|R|/n,|A|/n,|B|/n,|C|/n");
 
         for (int s = 0; s < nSamples; s++) {
             Prefs prefs = Prefs.random(rng, nSize);
             Permutation curr = Permutation.allUnmatched(nSize);
-            for (int i = 0; i < nIters; i++) {
-                aSizes[i] += CPII.unstablePairs(prefs, curr).size() / (double)nSamples;
+            int nUnstable = Integer.MAX_VALUE;
+            for (int i = 0; i < maxIters; i++) {
+                if (nUnstable == 0) {
+                    // we can skip work
+                    // as, bs, cs, and rs don't have any pairs
+                    // ks stay as previous (size n)
+                    kSizes[i] += nSize / (double)nSamples;
+                    continue;
+                }
+                nUnstable = CPII.unstablePairs(prefs, curr).size();
+                aSizes[i] += nUnstable / (double)nSamples;
                 
                 int[] bs = CPII.maleDominantUnstablePairs(prefs, curr);
                 int[] cs = CPII.maleFemaleDominantUnstablePairs(prefs, bs);
@@ -107,7 +116,7 @@ class Main {
                 kSizes[i] += countMatches(curr.perm) / (double)nSamples;
             }
         }
-        for (int i = 0; i < nIters; i++) {
+        for (int i = 0; i < maxIters; i++) {
             System.out.printf("%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", 
                 i + 1,
                 kSizes[i], rSizes[i], aSizes[i], bSizes[i], cSizes[i],
