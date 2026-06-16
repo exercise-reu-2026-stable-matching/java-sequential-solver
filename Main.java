@@ -110,10 +110,10 @@ class Main {
 
                 Pair<Permutation, Integer> result = CPII.iterationPhase(prefs, curr, bs, cs);
 
-                curr = result.fst();
-
                 rSizes[i] += result.snd() / (double)nSamples;
                 kSizes[i] += countMatches(curr.perm) / (double)nSamples;
+
+                curr = result.fst();
             }
         }
         for (int i = 0; i < maxIters; i++) {
