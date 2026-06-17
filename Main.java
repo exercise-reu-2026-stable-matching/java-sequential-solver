@@ -85,7 +85,7 @@ class Main {
                  aSizes = new double[maxIters], 
                  bSizes = new double[maxIters], 
                  cSizes = new double[maxIters];
-        System.out.println("i,|K|,|R|,|A|,|B|,|C|,|K|/n,|R|/n,|A|/n,|B|/n,|C|/n");
+        System.out.println("i,|K|,|R|,|A|,|B|,|C|,|K|/n,|R|/n,|A|/n^2,|B|/n,|C|/n");
 
         for (int s = 0; s < nSamples; s++) {
             Prefs prefs = Prefs.random(rng, nSize);
@@ -105,13 +105,19 @@ class Main {
                 int[] bs = CPII.maleDominantUnstablePairs(prefs, curr);
                 int[] cs = CPII.maleFemaleDominantUnstablePairs(prefs, bs);
 
-                bSizes[i] += countMatches(bs) / (double)nSamples;
-                cSizes[i] += countMatches(cs) / (double)nSamples;
+                int bSize = countMatches(bs);
+                int cSize = countMatches(cs);
+                bSizes[i] += bSize / (double)nSamples;
+                cSizes[i] += cSize / (double)nSamples;
 
                 Pair<Permutation, Integer> result = CPII.iterationPhase(prefs, curr, bs, cs);
 
                 rSizes[i] += result.snd() / (double)nSamples;
-                kSizes[i] += countMatches(curr.perm) / (double)nSamples;
+
+                int kSize = countMatches(curr.perm);
+                kSizes[i] += kSize / (double)nSamples;
+
+                assert kSize + bSize == nSize : String.format("%d + %d =? %d", kSize, bSize, nSize);
 
                 curr = result.fst();
             }
@@ -120,7 +126,7 @@ class Main {
             System.out.printf("%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", 
                 i + 1,
                 kSizes[i], rSizes[i], aSizes[i], bSizes[i], cSizes[i],
-                kSizes[i] / nSize, rSizes[i] / nSize, aSizes[i] / nSize, bSizes[i] / nSize, cSizes[i] / nSize
+                kSizes[i] / nSize, rSizes[i] / nSize, aSizes[i] / (nSize * nSize), bSizes[i] / nSize, cSizes[i] / nSize
             );
         }
     }
