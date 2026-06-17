@@ -85,7 +85,10 @@ class Main {
                  aSizes = new double[maxIters], 
                  bSizes = new double[maxIters], 
                  cSizes = new double[maxIters];
-        System.out.println("i,|K|,|R|,|A|,|B|,|C|,|K|/n,|R|/n,|A|/n^2,|B|/n,|C|/n");
+        // System.out.println("i,|K|,|R|,|A|,|B|,|C|,|K|/n,|R|/n,|A|/n^2,|B|/n,|C|/n");
+
+        double usMean = 0.0, upMean = 0.0;
+        System.out.println("usMean,upMean,usMean/n,usMean/n^2,upMean/n,upMean/n^2");
 
         for (int s = 0; s < nSamples; s++) {
             Prefs prefs = Prefs.random(rng, nSize);
@@ -119,15 +122,41 @@ class Main {
 
                 assert kSize + bSize == nSize : String.format("%d + %d =? %d", kSize, bSize, nSize);
 
+                if (i == 0) { // really i = 1 (zero indexed)
+                    Permutation c1 = result.fst();
+                    final int c1Size = countMatches(c1.perm);
+                    int u = CPII.unstablePairs(prefs, c1).size(); // U = number unstable pairs in K_2 = C_1
+                    int us = 0; // U_s, the number of (single, single) pairs under C_1
+                    int up = 0; // U_p, the number of (single m, w prefers m to C_1^{-1}(w)) pairs
+                    for (int m = 0; m < nSize; m++)
+                        for (int w = 0; w < nSize; w++) {
+                            if (c1.get(m) == -1 && c1.getInverse(w) == -1)
+                                us++;
+                            if (c1.get(m) == -1 && c1.getInverse(w) != -1 && prefs.femalePrefs(w, c1.getInverse(w)) > prefs.femalePrefs(w, m))
+                                up++;
+                        }
+                    assert u == us + up;
+                    assert us == (nSize - c1Size) * (nSize - c1Size);
+                    
+                    usMean += us / (double)nSamples;
+                    upMean += up / (double)nSamples;
+                }
+
                 curr = result.fst();
+
             }
         }
+
+        System.out.printf("%f,%f,%f,%f,%f,%f\n", 
+            usMean, upMean, 
+            usMean / nSize, usMean / (nSize * nSize),
+            upMean / nSize, upMean / (nSize * nSize));
         for (int i = 0; i < maxIters; i++) {
-            System.out.printf("%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", 
-                i + 1,
-                kSizes[i], rSizes[i], aSizes[i], bSizes[i], cSizes[i],
-                kSizes[i] / nSize, rSizes[i] / nSize, aSizes[i] / (nSize * nSize), bSizes[i] / nSize, cSizes[i] / nSize
-            );
+            // System.out.printf("%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", 
+            //     i + 1,
+            //     kSizes[i], rSizes[i], aSizes[i], bSizes[i], cSizes[i],
+            //     kSizes[i] / nSize, rSizes[i] / nSize, aSizes[i] / (nSize * nSize), bSizes[i] / nSize, cSizes[i] / nSize
+            // );
         }
     }
 }
