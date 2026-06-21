@@ -87,8 +87,9 @@ class Main {
                  cSizes = new double[maxIters];
         // System.out.println("i,|K|,|R|,|A|,|B|,|C|,|K|/n,|R|/n,|A|/n^2,|B|/n,|C|/n");
 
-        double usMean = 0.0, upMean = 0.0;
-        System.out.println("usMean,upMean,usMean/n,usMean/n^2,upMean/n,upMean/n^2");
+        double usMean = 0.0, upMean = 0.0, h1Mean = 0.0, h2Mean = 0.0;
+        System.out.println("usMean,upMean,h1Mean,h2Mean," + 
+            "usMean/n,usMean/n^2,upMean/n,upMean/n^2,h1Mean/n,h1Mean/n^2,h2Mean/n,h2Mean/n^2");
 
         for (int s = 0; s < nSamples; s++) {
             Prefs prefs = Prefs.random(rng, nSize);
@@ -120,6 +121,8 @@ class Main {
                 int kSize = countMatches(curr.perm);
                 kSizes[i] += kSize / (double)nSamples;
 
+                for (int m = 0; m < nSize; m++)
+                    assert bs[m] == -1 || curr.get(m) == -1;
                 assert kSize + bSize == nSize : String.format("%d + %d =? %d", kSize, bSize, nSize);
 
                 if (i == 0) { // really i = 1 (zero indexed)
@@ -128,18 +131,26 @@ class Main {
                     int u = CPII.unstablePairs(prefs, c1).size(); // U = number unstable pairs in K_2 = C_1
                     int us = 0; // U_s, the number of (single, single) pairs under C_1
                     int up = 0; // U_p, the number of (single m, w prefers m to C_1^{-1}(w)) pairs
+                    int h1 = 0; // H_1, the first condition required for contribution to U_p (unmatched man)
+                    int h2 = 0; // H_2, the second condition required for contribution to U_p (woman who prefers the unmatched man to her current match)
                     for (int m = 0; m < nSize; m++)
                         for (int w = 0; w < nSize; w++) {
                             if (c1.get(m) == -1 && c1.getInverse(w) == -1)
                                 us++;
                             if (c1.get(m) == -1 && c1.getInverse(w) != -1 && prefs.femalePrefs(w, c1.getInverse(w)) > prefs.femalePrefs(w, m))
                                 up++;
+                            if (c1.get(m) == -1)
+                                h1++;
+                            if (c1.getInverse(w) != -1 && prefs.femalePrefs(w, c1.getInverse(w)) > prefs.femalePrefs(w, m))
+                                h2++;
                         }
                     assert u == us + up;
                     assert us == (nSize - c1Size) * (nSize - c1Size);
                     
                     usMean += us / (double)nSamples;
                     upMean += up / (double)nSamples;
+                    h1Mean += h1 / (double)nSamples;
+                    h2Mean += h2 / (double)nSamples;
                 }
 
                 curr = result.fst();
@@ -147,10 +158,12 @@ class Main {
             }
         }
 
-        System.out.printf("%f,%f,%f,%f,%f,%f\n", 
-            usMean, upMean, 
+        System.out.printf("%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", 
+            usMean, upMean, h1Mean, h2Mean,
             usMean / nSize, usMean / (nSize * nSize),
-            upMean / nSize, upMean / (nSize * nSize));
+            upMean / nSize, upMean / (nSize * nSize),
+            h1Mean / nSize, h1Mean / (nSize * nSize),
+            h2Mean / nSize, h2Mean / (nSize * nSize));
         for (int i = 0; i < maxIters; i++) {
             // System.out.printf("%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", 
             //     i + 1,
