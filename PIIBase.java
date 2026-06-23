@@ -26,7 +26,7 @@ abstract class PIIBase {
         return new Pair<>(curr, prefs.isStableMatching(curr));
     }
 
-    public final Pair<Optional<Permutation>, Integer> runOrCycle(Prefs prefs, Permutation initial) {
+    public Pair<Optional<Permutation>, Integer> runOrCycle(Prefs prefs, Permutation initial) {
         Permutation curr = initial;
         Set<Permutation> visited = new HashSet<>();
 

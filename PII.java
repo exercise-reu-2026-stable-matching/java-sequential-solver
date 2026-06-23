@@ -1,20 +1,27 @@
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 
 class PII extends PIIBase {
     private final Random rng;
+    public static final List<StateData> stateDataList = new ArrayList<>();
+    public static int trialIndex = 0;
+    private static StateData currentStateData;
 
     PII(Random rng) {
         this.rng = rng;
     }
 
     PII() {
-        this.rng = new Random();
+        this(new Random());
     }
 
     @Override
@@ -40,7 +47,9 @@ class PII extends PIIBase {
             assert !rev.containsKey(v) : "Duplicate value " + v;
             rev.put(v, k);
         }
-            
+
+        currentStateData.addNM2_gen(out.values());
+
         return out;
     }
 
@@ -82,7 +91,6 @@ class PII extends PIIBase {
             out[i].inCol = nm2GeneratingPair;
             out[l].inRow = nm2GeneratingPair;
         }
-
         return out;
     }
 
@@ -117,6 +125,8 @@ class PII extends PIIBase {
                 out.get(inCol).cPtr = inRow;
             }
         }
+
+        currentStateData.addNM2Graph(out);
         return out;
     }
 
@@ -188,11 +198,16 @@ class PII extends PIIBase {
     // once we have the nm1-pairs, the iteration steps no longer depend on the input
     static Permutation iterationPhase(Permutation mensMatches, List<Index> nm1Pairs) {
         final int n = mensMatches.size();
+
         Set<Index> nmPairs = // initially nm2 pairs
             nm2Pairs(mensMatches, 
                 nm2GeneratingGraph(mensMatches, 
                     nm2GeneratingPairsAssociatedWithMatchingPair(mensMatches, 
                         nm2GeneratingPairs(mensMatches, nm1Pairs))));
+
+        currentStateData.addNM1(nm1Pairs);
+        currentStateData.addNM2(nmPairs);
+
         checkNMPairs(n, nm1Pairs, nmPairs);
         nmPairs.addAll(nm1Pairs);
     
@@ -215,7 +230,58 @@ class PII extends PIIBase {
     public Permutation iterationPhase(Prefs prefs, Permutation mensMatches) {
         prefs.checkPermLength(mensMatches);
 
+        currentStateData = new StateData(prefs);
+        stateDataList.add(currentStateData);
+
+        currentStateData.addMatching(mensMatches.toIndices(), mensMatches);
+        currentStateData.addUnstable(prefs.unstablePairs(mensMatches));
+
         List<Index> nm1Pairs = prefs.nm1Pairs(mensMatches, prefs.nm1GeneratingPairs(mensMatches));
         return iterationPhase(mensMatches, nm1Pairs);
+    }
+
+    @Override
+    public Pair<Optional<Permutation>, Integer> runOrCycle(Prefs prefs, Permutation initial) {
+        Pair<Optional<Permutation>, Integer> runOrCyclePair = super.runOrCycle(prefs, initial);
+        Optional<Permutation> stablePerm = runOrCyclePair.fst();
+        int iters = runOrCyclePair.snd();
+
+        for (int i = 1; i <= iters; i++) {
+            StateData stateData = stateDataList.get(stateDataList.size() - i);
+            stateData.converges = stablePerm.isPresent();
+            stateData.trialIndex = trialIndex;
+        }
+
+        trialIndex++;
+        return runOrCyclePair;
+    }
+
+    public static void toCSV(String filename) {
+        try (PrintWriter printWriter = new PrintWriter(filename)) {
+            // Create CSV headers
+            StringBuilder builder = new StringBuilder();
+            builder.append("trialIndex,numUnstable,numNM1,numNM2,");
+
+            builder.append("matchingAM,matchingGM,");
+            String[] pairNames = {"unstable", "nm1", "nm2Gen", "nm2"};
+            for (String pairName : pairNames) {
+                builder.append(pairName).append("AM,");
+                builder.append(pairName).append("GM,");
+                builder.append(pairName).append("RAM,");
+            }
+
+            builder.append("numEdges,numSingletons,numChains,numCycles,");
+            builder.append("avgChainLen,avgCycleLen,converges");
+
+            printWriter.println(builder.toString());
+
+            // Write CSV line for each state
+            for (StateData stateData : stateDataList) {
+                printWriter.println(stateData.toCSVString());
+            }
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException("File " + filename + " not found!");
+        }
     }
 }

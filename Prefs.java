@@ -112,6 +112,20 @@ record Prefs(Permutation[] malePrefs, Permutation[] femalePrefs) {
              && (matchedMan == -1 || femalePrefs(x, y) < femalePrefs(x, matchedMan)));
     }
 
+    List<Index> unstablePairs(Permutation mensMatches)
+    {
+        List<Index> unstablePairs = new ArrayList<>();
+        for (int y = 0; y < n(); y++) {
+            for (int x = 0; x < n(); x++) {
+                if (isUnstablePair(mensMatches, y, x)) {
+                    unstablePairs.add(new Index(y, x));
+                }
+            }
+        }
+
+        return unstablePairs;
+    }
+
     boolean isStableMatching(Permutation mensMatches) {
         for (int y = 0; y < n(); y++) 
             for (int x = 0; x < n(); x++)
@@ -139,6 +153,7 @@ record Prefs(Permutation[] malePrefs, Permutation[] femalePrefs) {
             if (idxOfMinLeftValue != -1)
                 out.add(new Index(y, idxOfMinLeftValue));
         }
+
         return out;
     }
 

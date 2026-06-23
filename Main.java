@@ -59,9 +59,11 @@ class Main {
     }
 
     public static void main(String[] args) {
-        Random rng = new Random(1);
-        final int nIters = Integer.parseInt(args[0]);
-        final int nSize  = Integer.parseInt(args[1]);
+        Random rng = new Random();
+        final int nIters       = Integer.parseInt(args[0]);
+        final int nSize        = Integer.parseInt(args[1]);
+        final String writeFile = args[2];
+
         PII pii = new PII();
         CPII cpii = new CPII();
 
@@ -72,10 +74,13 @@ class Main {
         long nPIIConverging = 0, nItersForPIIOfConverging = 0, nItersForPIIOfDiverging = 0,
              nItersForCPII = 0;
 
+        // int j = 0;
         for (int i = 0; i < nIters; i++) {
             Prefs prefs = Prefs.random(rng, nSize);
             var piiResult = countCycles(pii, prefs, identity);
             var cpiiResult = countCycles(cpii, prefs, empty);
+
+            // System.out.println(prefs);
 
             if (piiResult.fst()) {
                 nPIIConverging++;
@@ -85,9 +90,17 @@ class Main {
 
             assert cpiiResult.fst() : prefs;
             nItersForCPII += cpiiResult.snd();
+
+            // for (; j < PII.stateDataList.size(); j++) {
+            //     System.out.println(PII.stateDataList.get(j).converges);
+            // }
+            // System.out.println();
         }
 
         System.out.printf("%d,%d,%d,%d,%d\n", 
             nPIIConverging, nIters - nPIIConverging, nItersForPIIOfConverging, nItersForPIIOfDiverging, nItersForCPII);
+        
+        // System.out.println(PII.stateDataList.get(0).toCSVString());
+        PII.toCSV(writeFile);
     }
 }

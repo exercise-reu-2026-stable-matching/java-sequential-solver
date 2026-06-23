@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import java.util.stream.Stream;
@@ -117,6 +119,14 @@ class Permutation {
         int tmp = arr[i];
         arr[i] = arr[j];
         arr[j] = tmp;
+    }
+
+    public List<Index> toIndices() {
+        List<Index> indices = new ArrayList<>();
+        for (int y = 0; y < perm.length; y++) {
+            indices.add(new Index(y, perm[y]));
+        }
+        return indices;
     }
 
     /** The next permutation in the left-to-right lexicographic ordering, returning `null` once the end is reached.
