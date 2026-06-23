@@ -87,9 +87,11 @@ class Main {
                  cSizes = new double[maxIters];
         // System.out.println("i,|K|,|R|,|A|,|B|,|C|,|K|/n,|R|/n,|A|/n^2,|B|/n,|C|/n");
 
-        double usMean = 0.0, upMean = 0.0, h1Mean = 0.0, h2Mean = 0.0;
-        System.out.println("usMean,upMean,h1Mean,h2Mean," + 
-            "usMean/n,usMean/n^2,upMean/n,upMean/n^2,h1Mean/n,h1Mean/n^2,h2Mean/n,h2Mean/n^2");
+        // double usMean = 0.0, upMean = 0.0, h1Mean = 0.0, h2Mean = 0.0;
+        // double k2SizeSquared = 0.0;
+        System.out.printf("|A_%d|,|A_%d|/n^2,q:=P[single in K_%d],q(1-q)\n", maxIters, maxIters, maxIters);
+        double aSizeAtEnd = 0.0; // U
+        double q = 0.0, qProd = 0.0;
 
         for (int s = 0; s < nSamples; s++) {
             Prefs prefs = Prefs.random(rng, nSize);
@@ -146,11 +148,17 @@ class Main {
                         }
                     assert u == us + up;
                     assert us == (nSize - c1Size) * (nSize - c1Size);
-                    
-                    usMean += us / (double)nSamples;
-                    upMean += up / (double)nSamples;
-                    h1Mean += h1 / (double)nSamples;
-                    h2Mean += h2 / (double)nSamples;
+                }
+
+                if (i == maxIters - 1) { // last time
+                    aSizeAtEnd += nUnstable / (double)nSamples;
+                    int singleCount = 0;
+                    for (int w : curr.perm)
+                        if (w == -1)
+                            singleCount++;
+                    double singleProb = singleCount / (double)nSize;
+                    q += singleProb / nSamples;
+                    qProd += singleProb * (1 - singleProb) / nSamples;
                 }
 
                 curr = result.fst();
@@ -158,12 +166,7 @@ class Main {
             }
         }
 
-        System.out.printf("%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", 
-            usMean, upMean, h1Mean, h2Mean,
-            usMean / nSize, usMean / (nSize * nSize),
-            upMean / nSize, upMean / (nSize * nSize),
-            h1Mean / nSize, h1Mean / (nSize * nSize),
-            h2Mean / nSize, h2Mean / (nSize * nSize));
+        System.out.printf("%f,%f,%f,%f\n", aSizeAtEnd, aSizeAtEnd / (nSize * nSize), q, qProd);
         for (int i = 0; i < maxIters; i++) {
             // System.out.printf("%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n", 
             //     i + 1,
