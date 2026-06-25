@@ -1,0 +1,11 @@
+#!/bin/zsh
+
+# count iteration means for various 
+
+echo "n,iters"
+for n in {1..100} 
+do
+    # https://www.statology.org/how-to-calculate-basic-descriptive-statistics-using-bash/
+    mean=$(java -ea Main 100000 $n | awk '{ total += $1; count++ } END { print total/count }')
+    printf "%s,%s\n" $n $mean
+done
