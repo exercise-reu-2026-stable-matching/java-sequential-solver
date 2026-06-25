@@ -1,3 +1,5 @@
+import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -58,36 +60,23 @@ class Main {
         return new Pair<>(result.fst().isPresent(), result.snd());
     }
 
-    public static void main(String[] args) {
-        Random rng = new Random(1);
-        final int nIters = Integer.parseInt(args[0]);
+    public static void main(String[] args) throws IOException {
+        final Random rng = new Random(1);
+        final int nSamples = Integer.parseInt(args[0]);
         final int nSize  = Integer.parseInt(args[1]);
-        PII pii = new PII();
-        CPII cpii = new CPII();
+        final CPII cpii = new CPII();
 
-        System.out.println("pii_converged,pii_diverged,pii_converged_total_iters,pii_diverged_total_iters,cpii_total_iters");
-        Permutation identity = Permutation.identity(nSize);
-        Permutation empty = Permutation.allUnmatched(nSize);
-
-        long nPIIConverging = 0, nItersForPIIOfConverging = 0, nItersForPIIOfDiverging = 0,
-             nItersForCPII = 0;
-
-        for (int i = 0; i < nIters; i++) {
-            Prefs prefs = Prefs.random(rng, nSize);
-            var piiResult = countCycles(pii, prefs, identity);
-            var cpiiResult = countCycles(cpii, prefs, empty);
-
-            if (piiResult.fst()) {
-                nPIIConverging++;
-                nItersForPIIOfConverging += piiResult.snd();
-            } else
-                nItersForPIIOfDiverging += piiResult.snd();
-
-            assert cpiiResult.fst() : prefs;
-            nItersForCPII += cpiiResult.snd();
+        final Permutation empty = Permutation.allUnmatched(nSize);
+    
+        try (BufferedOutputStream out = new BufferedOutputStream(System.out)) { // don't flush every time
+            for (int i = 0; i < nSamples; i++) {
+                Prefs prefs = Prefs.random(rng, nSize);
+                var result = cpii.runOrCycle(prefs, empty);
+                assert result.fst().isPresent(); // CPII should always converge
+                int nCycles = result.snd();
+                assert nCycles <= nSize * nSize;
+                out.write((nCycles + "\n").getBytes());
+            }
         }
-
-        System.out.printf("%d,%d,%d,%d,%d\n", 
-            nPIIConverging, nIters - nPIIConverging, nItersForPIIOfConverging, nItersForPIIOfDiverging, nItersForCPII);
     }
 }
