@@ -53,8 +53,8 @@ class Main {
         return ts.flatMap(t -> us.get().map(u -> f.apply(t, u)));
     }
 
-    static Pair<Boolean, Integer> countCycles(PIIBase pii, Prefs prefs, Permutation init) {
-        var result = pii.runOrCycle(prefs, init);
+    static Pair<Boolean, Integer> countCycles(PII pii, Prefs prefs, Permutation init, int nIters) {
+        var result = pii.runOrCycle(prefs, init, nIters);
         return new Pair<>(result.fst().isPresent(), result.snd());
     }
 
@@ -65,41 +65,30 @@ class Main {
         final String writeFile = args[2];
 
         PII pii = new PII();
-        CPII cpii = new CPII();
 
-        System.out.println("pii_converged,pii_diverged,pii_converged_total_iters,pii_diverged_total_iters,cpii_total_iters");
+        System.out.println("pii_converged,pii_diverged,pii_converged_total_iters,pii_diverged_total_iters");
         Permutation identity = Permutation.identity(nSize);
-        Permutation empty = Permutation.allUnmatched(nSize);
 
-        long nPIIConverging = 0, nItersForPIIOfConverging = 0, nItersForPIIOfDiverging = 0,
-             nItersForCPII = 0;
+        long nPIIConverging = 0, nPIICycle = 0, nItersForPIIOfConverging = 0, nItersForPIIOfDiverging = 0;
 
-        // int j = 0;
-        for (int i = 0; i < nIters; i++) {
+        while (PII.cycleCount < nIters || PII.convergeCount < nIters) {
             Prefs prefs = Prefs.random(rng, nSize);
-            var piiResult = countCycles(pii, prefs, identity);
-            var cpiiResult = countCycles(cpii, prefs, empty);
+            var piiResult = countCycles(pii, prefs, identity, nIters);
 
             // System.out.println(prefs);
 
             if (piiResult.fst()) {
                 nPIIConverging++;
                 nItersForPIIOfConverging += piiResult.snd();
-            } else
+            } else {
+                nPIICycle++;
                 nItersForPIIOfDiverging += piiResult.snd();
-
-            assert cpiiResult.fst() : prefs;
-            nItersForCPII += cpiiResult.snd();
-
-            // for (; j < PII.stateDataList.size(); j++) {
-            //     System.out.println(PII.stateDataList.get(j).converges);
-            // }
-            // System.out.println();
+            }
         }
 
-        System.out.printf("%d,%d,%d,%d,%d\n", 
-            nPIIConverging, nIters - nPIIConverging, nItersForPIIOfConverging, nItersForPIIOfDiverging, nItersForCPII);
-        
+        System.out.printf("%d,%d,%d,%d\n", 
+            nPIIConverging, nPIICycle, nItersForPIIOfConverging, nItersForPIIOfDiverging);
+
         // System.out.println(PII.stateDataList.get(0).toCSVString());
         PII.toCSV(writeFile);
     }

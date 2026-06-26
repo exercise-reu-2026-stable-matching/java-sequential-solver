@@ -13,8 +13,11 @@ import java.util.Set;
 class PII extends PIIBase {
     private final Random rng;
     public static final List<StateData> stateDataList = new ArrayList<>();
-    public static int trialIndex = 0;
     private static StateData currentStateData;
+
+    public static int trialIndex = 0;
+    public static int convergeCount = 0;
+    public static int cycleCount = 0;
 
     PII(Random rng) {
         this.rng = rng;
@@ -240,20 +243,43 @@ class PII extends PIIBase {
         return iterationPhase(mensMatches, nm1Pairs);
     }
 
-    @Override
-    public Pair<Optional<Permutation>, Integer> runOrCycle(Prefs prefs, Permutation initial) {
-        Pair<Optional<Permutation>, Integer> runOrCyclePair = super.runOrCycle(prefs, initial);
+    public Pair<Optional<Permutation>, Integer> runOrCycle(Prefs prefs, Permutation initial, int nIters) {
+
+        Pair<Optional<Permutation>, Integer> runOrCyclePair = runOrCycle(prefs, initial);
         Optional<Permutation> stablePerm = runOrCyclePair.fst();
+        boolean converges = stablePerm.isPresent();
         int iters = runOrCyclePair.snd();
 
-        for (int i = 1; i <= iters; i++) {
-            StateData stateData = stateDataList.get(stateDataList.size() - i);
-            stateData.converges = stablePerm.isPresent();
-            stateData.trialIndex = trialIndex;
+        if (converges && convergeCount < nIters) {
+            addTrialData(converges, iters);
+            convergeCount++;
+            // System.out.printf("Trial index: %d (%b)\n", PII.trialIndex, converges);
+        }
+        else if (!converges && cycleCount < nIters) {
+            addTrialData(converges, iters);
+            cycleCount++;
+            // System.out.printf("Trial index: %d (%b)\n", PII.trialIndex, converges);
+        }
+        else {
+            deleteStateData(iters);
         }
 
         trialIndex++;
         return runOrCyclePair;
+    }
+
+    private void addTrialData(boolean converges, int iters) {
+        for (int i = 1; i <= iters; i++) {
+            StateData stateData = stateDataList.get(stateDataList.size() - i);
+            stateData.converges = converges;
+            stateData.trialIndex = trialIndex;
+        }
+    }
+
+    private void deleteStateData(int iters) {
+        for (int i = 1; i <= iters; i++) {
+            stateDataList.removeLast();
+        }
     }
 
     public static void toCSV(String filename) {
