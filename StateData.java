@@ -75,6 +75,13 @@ class StateData {
         builder.append(programIndex).append(",");
         builder.append(trialIndex).append(",");
 
+        builder.append(numEdges).append(",");
+        builder.append(numSingletons).append(",");
+        builder.append(numChains).append(",");
+        builder.append(numCycles).append(",");
+        builder.append(avgChainLength).append(",");
+        builder.append(avgCycleLength).append(",");
+        
         builder.append(unstablePairs.size()).append(",");
         builder.append(nm1Pairs.size()).append(",");
         builder.append(nm2Pairs.size()).append(",");
@@ -85,12 +92,6 @@ class StateData {
         builder.append(nm2GenMeans.toCSVString());
         builder.append(nm2Means.toCSVString());
 
-        builder.append(numEdges).append(",");
-        builder.append(numSingletons).append(",");
-        builder.append(numChains).append(",");
-        builder.append(numCycles).append(",");
-        builder.append(avgChainLength).append(",");
-        builder.append(avgCycleLength).append(",");
         
         builder.append(converges ? 1 : 0);
 
