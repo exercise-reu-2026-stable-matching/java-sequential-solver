@@ -63,6 +63,8 @@ class Main {
         final int nIters       = Integer.parseInt(args[0]);
         final int nSize        = Integer.parseInt(args[1]);
         final String writeFile = args[2];
+        
+        final int programIndex = args.length >= 4 ? Integer.parseInt(args[3]) : 0;
 
         PII pii = new PII();
 
@@ -89,7 +91,7 @@ class Main {
         System.out.printf("%d,%d,%d,%d\n", 
             nPIIConverging, nPIICycle, nItersForPIIOfConverging, nItersForPIIOfDiverging);
 
-        // System.out.println(PII.stateDataList.get(0).toCSVString());
-        PII.toCSV(writeFile);
+        // System.out.println(PII.stateDataList.get(0).toCSVString(programIndex));
+        PII.toCSV(writeFile, programIndex);
     }
 }

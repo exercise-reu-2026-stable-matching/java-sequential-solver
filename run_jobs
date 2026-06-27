@@ -1,6 +1,12 @@
-#!/usr/bin/zsh
+#!/usr/bin/bash
+
+TMPDIR="/tmp"
 
 rm -f *.class
 javac Main.java
 
-sbatch job
+JOB_OUTPUT=$(sbatch job)
+echo $JOB_OUTPUT
+
+# Send job ID to monitor script
+bash monitor $(echo $JOB_OUTPUT | grep -E -o -a -m 1 -h "[0-9]+")

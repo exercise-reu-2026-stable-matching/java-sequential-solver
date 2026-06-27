@@ -70,8 +70,9 @@ class StateData {
         System.out.printf("\nConverges?  %B\n", converges);
     }
 
-    public String toCSVString() {
+    public String toCSVString(int programIndex) {
         StringBuilder builder = new StringBuilder();
+        builder.append(programIndex).append(",");
         builder.append(trialIndex).append(",");
 
         builder.append(unstablePairs.size()).append(",");

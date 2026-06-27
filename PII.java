@@ -282,11 +282,11 @@ class PII extends PIIBase {
         }
     }
 
-    public static void toCSV(String filename) {
+    public static void toCSV(String filename, int programIndex) {
         try (PrintWriter printWriter = new PrintWriter(filename)) {
             // Create CSV headers
             StringBuilder builder = new StringBuilder();
-            builder.append("trialIndex,numUnstable,numNM1,numNM2,");
+            builder.append("programIndex,trialIndex,numUnstable,numNM1,numNM2,");
 
             builder.append("matchingAM,matchingGM,");
             String[] pairNames = {"unstable", "nm1", "nm2Gen", "nm2"};
@@ -303,7 +303,7 @@ class PII extends PIIBase {
 
             // Write CSV line for each state
             for (StateData stateData : stateDataList) {
-                printWriter.println(stateData.toCSVString());
+                printWriter.println(stateData.toCSVString(programIndex));
             }
         }
         catch (FileNotFoundException e) {
