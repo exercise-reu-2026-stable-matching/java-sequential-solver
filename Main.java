@@ -9,7 +9,6 @@ class Main {
         final int nSize  = Integer.parseInt(args[0]);
         final int nSamples = Integer.parseInt(args[1]);
         final Permutation initial = Permutation.allUnmatched(nSize);
-        final CPIISlow slow = new CPIISlow();
 
         // Buffer to avoid overhead of System.out.println each time
         try (BufferedOutputStream out = new BufferedOutputStream(System.out)) {
@@ -21,6 +20,7 @@ class Main {
                 assert resultFast.fst().isPresent();
                 int itersToConvergeFast = resultFast.snd();
 
+                CPII slow = new CPIISlow(prefs);
                 var resultSlow = slow.runOrCycle(prefs, initial);
                 assert resultSlow.fst().isPresent();
                 int itersToConvergeSlow = resultSlow.snd();
