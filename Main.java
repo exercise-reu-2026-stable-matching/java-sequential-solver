@@ -15,12 +15,12 @@ class Main {
             for (int i = 0; i < nSamples; i++) {
                 final Prefs prefs = Prefs.random(rng, nSize);
 
-                CPIIFast fast = new CPIIFast(prefs);
+                CPIIFast fast = new CPIIFast(nSize);
                 var resultFast = fast.runOrCycle(prefs, initial);
                 assert resultFast.fst().isPresent();
                 int itersToConvergeFast = resultFast.snd();
 
-                CPII slow = new CPIISlow(prefs);
+                CPII slow = new CPIISlow(nSize);
                 var resultSlow = slow.runOrCycle(prefs, initial);
                 assert resultSlow.fst().isPresent();
                 int itersToConvergeSlow = resultSlow.snd();

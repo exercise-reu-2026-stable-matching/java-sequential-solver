@@ -3,13 +3,11 @@ import java.util.Arrays;
 abstract class CPII extends PIIBase {
     protected static final int UNMATCHED = -1;
 
-    protected final Prefs prefs;
     /** Size */
     protected final int n;
 
-    CPII(Prefs prefs) {
-        this.prefs = prefs;
-        n = prefs.n();
+    CPII(int n) {
+        this.n = n;
     }
 
     final static int[] allUnmatched(int n) {
@@ -38,11 +36,11 @@ abstract class CPII extends PIIBase {
     }
 
     /** Return the male-dominant unstable pair for each row, or -1 if no such pair exists */
-    protected abstract int[] maleDominantUnstablePairs(Permutation mensMatches);
+    protected abstract int[] maleDominantUnstablePairs(Prefs prefs, Permutation mensMatches);
 
     /** Return the male-female-dominant unstable pair for each column, or -1 if no such pair exists.
      */
-    protected abstract int[] maleFemaleDominantUnstablePairs(int[] maleDominantUnstablePairs);
+    protected abstract int[] maleFemaleDominantUnstablePairs(Prefs prefs, int[] maleDominantUnstablePairs);
 
     // ks is like mensMatches
     @Override
@@ -50,9 +48,9 @@ abstract class CPII extends PIIBase {
         if (n != prefs.n()) throw new RuntimeException(); // TODO
         
 
-        int[] bs = maleDominantUnstablePairs(ks);
+        int[] bs = maleDominantUnstablePairs(prefs, ks);
         // System.out.println("bs: " + Arrays.toString(bs));
-        int[] cs = maleFemaleDominantUnstablePairs(bs);
+        int[] cs = maleFemaleDominantUnstablePairs(prefs, bs);
         // System.out.println("cs: " + Arrays.toString(cs));
         
         // start totally empty

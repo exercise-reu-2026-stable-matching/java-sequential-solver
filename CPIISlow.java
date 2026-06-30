@@ -1,12 +1,13 @@
 
 class CPIISlow extends CPII {
-    CPIISlow(Prefs prefs) {
-        super(prefs);
+    
+    CPIISlow(int n) {
+        super(n);
     }
 
     /** Return the male-dominant unstable pair for each row, or -1 if no such pair exists */
     @Override
-    protected int[] maleDominantUnstablePairs(Permutation mensMatches) {
+    protected int[] maleDominantUnstablePairs(Prefs prefs, Permutation mensMatches) {
         int[] out = allUnmatched(n);
 
         for (int m = 0; m < n; m++) {
@@ -25,7 +26,7 @@ class CPIISlow extends CPII {
     /** Return the male-female-dominant unstable pair for each column, or -1 if no such pair exists.
      */
     @Override
-    protected int[] maleFemaleDominantUnstablePairs(int[] maleDominantUnstablePairs) {
+    protected int[] maleFemaleDominantUnstablePairs(Prefs prefs, int[] maleDominantUnstablePairs) {
         int[] out = allUnmatched(n); // by column
 
         for (int y = 0; y < n; y++) {
