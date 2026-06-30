@@ -9,14 +9,14 @@ class Main {
         final int nSize  = Integer.parseInt(args[0]);
         final int nSamples = Integer.parseInt(args[1]);
         final Permutation initial = Permutation.allUnmatched(nSize);
-        final CPII slow = new CPII();
+        final CPIISlow slow = new CPIISlow();
 
         // Buffer to avoid overhead of System.out.println each time
         try (BufferedOutputStream out = new BufferedOutputStream(System.out)) {
             for (int i = 0; i < nSamples; i++) {
                 final Prefs prefs = Prefs.random(rng, nSize);
 
-                FastCPII fast = new FastCPII(prefs);
+                CPIIFast fast = new CPIIFast(prefs);
                 var resultFast = fast.runOrCycle(prefs, initial);
                 assert resultFast.fst().isPresent();
                 int itersToConvergeFast = resultFast.snd();

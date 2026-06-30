@@ -1,6 +1,6 @@
 import java.util.Arrays;
 
-class FastCPII extends PIIBase {
+class CPIISlow extends PIIBase {
     private static final int UNMATCHED = -1;
 
     static int[] allUnmatched(int n) {
@@ -27,34 +27,17 @@ class FastCPII extends PIIBase {
             && (matchedMan == UNMATCHED   || prefs.femalePrefs(x, y) < prefs.femalePrefs(x, matchedMan));
     }
 
-    private final Prefs prefs;
-    /** Size */
-    private final int n;
-    /** In `maleDominantUnstablePairs` we can skip looking at highly-ranked (low rank number) women 
-     * we already considered and broke up with. This should take the total runtime from O(n^2) per iteration
-     * to O(n^2) total
-      */
-    private final int[] maleCurrentProposalRanks;
-
-    FastCPII(Prefs prefs) {
-        this.prefs = prefs;
-        n = prefs.n();
-        maleCurrentProposalRanks = allUnmatched(n);
-    }
-
     /** Return the male-dominant unstable pair for each row, or -1 if no such pair exists */
-    private int[] maleDominantUnstablePairs(Permutation mensMatches) {
+    private static int[] maleDominantUnstablePairs(Prefs prefs, Permutation mensMatches) {
+        final int n = prefs.n();
         int[] out = allUnmatched(n);
 
         for (int m = 0; m < n; m++) {
             Permutation malePrefs = prefs.malePrefs()[m];
-            int currentRank = maleCurrentProposalRanks[m];
-            int startRank = currentRank == UNMATCHED ? 0 : currentRank;
-            for (int rank = startRank; rank < n; rank++) {
+            for (int rank = 0; rank < n; rank++) {
                 int w = malePrefs.getInverse(rank);
                 if (isUnstablePair(prefs, mensMatches, m, w)) {
                     out[m] = w;
-                    maleCurrentProposalRanks[m] = rank;
                     break;
                 }
             }
@@ -64,7 +47,8 @@ class FastCPII extends PIIBase {
 
     /** Return the male-female-dominant unstable pair for each column, or -1 if no such pair exists.
      */
-    private int[] maleFemaleDominantUnstablePairs(int[] maleDominantUnstablePairs) {
+    private static int[] maleFemaleDominantUnstablePairs(Prefs prefs, int[] maleDominantUnstablePairs) {
+        final int n = prefs.n();
         int[] out = allUnmatched(n); // by column
 
         for (int y = 0; y < n; y++) {
@@ -82,11 +66,12 @@ class FastCPII extends PIIBase {
     // ks is like mensMatches
     @Override
     Permutation iterationPhase(Prefs prefs, Permutation ks) {
-        int[] bs = maleDominantUnstablePairs(ks);
+        int[] bs = maleDominantUnstablePairs(prefs, ks);
         // System.out.println("bs: " + Arrays.toString(bs));
-        int[] cs = maleFemaleDominantUnstablePairs(bs);
+        int[] cs = maleFemaleDominantUnstablePairs(prefs, bs);
         // System.out.println("cs: " + Arrays.toString(cs));
         
+        final int n = prefs.n();
         // start totally empty
         int[] nextMatches = allUnmatched(n);
         int[] nextMatchesInv = allUnmatched(n);
