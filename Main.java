@@ -9,16 +9,25 @@ class Main {
         final int nSize  = Integer.parseInt(args[0]);
         final int nSamples = Integer.parseInt(args[1]);
         final Permutation initial = Permutation.allUnmatched(nSize);
+        final CPII slow = new CPII();
 
         // Buffer to avoid overhead of System.out.println each time
         try (BufferedOutputStream out = new BufferedOutputStream(System.out)) {
             for (int i = 0; i < nSamples; i++) {
-                Prefs prefs = Prefs.random(rng, nSize);
-                FastCPII cpii = new FastCPII(prefs);
-                var result = cpii.runOrCycle(prefs, initial);
-                assert result.fst().isPresent();
-                int itersToConverge = result.snd();
-                out.write((itersToConverge + "\n").getBytes());
+                final Prefs prefs = Prefs.random(rng, nSize);
+
+                FastCPII fast = new FastCPII(prefs);
+                var resultFast = fast.runOrCycle(prefs, initial);
+                assert resultFast.fst().isPresent();
+                int itersToConvergeFast = resultFast.snd();
+
+                var resultSlow = slow.runOrCycle(prefs, initial);
+                assert resultSlow.fst().isPresent();
+                int itersToConvergeSlow = resultSlow.snd();
+
+                assert itersToConvergeFast == itersToConvergeSlow;
+
+                out.write((itersToConvergeFast + "\n").getBytes());
             }
         }
     }
