@@ -1,4 +1,3 @@
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.util.Random;
 
@@ -10,21 +9,18 @@ class Main {
         final int nSamples = Integer.parseInt(args[1]);
         final Permutation initial = Permutation.allUnmatched(nSize);
 
-        // Buffer to avoid overhead of System.out.println each time
-        try (BufferedOutputStream out = new BufferedOutputStream(System.out)) {
-            for (int i = 0; i < nSamples; i++) {
-                final Prefs prefs = Prefs.random(rng, nSize);
+        for (int i = 0; i < nSamples; i++) {
+            final Prefs prefs = Prefs.random(rng, nSize);
 
-                CPII fast = new CPIIFast(nSize);
-                int itersToConvergeFast = fast.countIters(prefs, initial);
-                
-                CPII slow = new CPIISlow(nSize);
-                int itersToConvergeSlow = slow.countIters(prefs, initial);
+            CPII fast = new CPIIFast(nSize);
+            int itersToConvergeFast = fast.countIters(prefs, initial);
+            
+            // CPII slow = new CPIISlow(nSize);
+            // int itersToConvergeSlow = slow.countIters(prefs, initial);
 
-                assert itersToConvergeFast == itersToConvergeSlow;
+            // assert itersToConvergeFast == itersToConvergeSlow;
 
-                out.write((itersToConvergeFast + "\n").getBytes());
-            }
+            System.out.println(itersToConvergeFast);
         }
     }
 }
