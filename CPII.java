@@ -42,9 +42,8 @@ abstract class CPII extends PIIBase {
      */
     protected abstract int[] maleFemaleDominantUnstablePairs(Prefs prefs, int[] maleDominantUnstablePairs);
 
-    // ks is like mensMatches
-    @Override
-    final Permutation iterationPhase(Prefs prefs, Permutation ks) {
+    // ks is like mensMatches. Returns (next permutation, done)
+    private Pair<Permutation, Boolean> iterationPhaseImpl(Prefs prefs, Permutation ks) {
         if (n != prefs.n()) throw new RuntimeException(); // TODO
         
 
@@ -57,10 +56,13 @@ abstract class CPII extends PIIBase {
         int[] nextMatches = allUnmatched(n);
         int[] nextMatchesInv = allUnmatched(n);
 
+        // A empty iff C empty
+        boolean done = true;
         // add C_i
         for (int x = 0; x < n; x++) {
             int y = cs[x];
             if (y != UNMATCHED) {
+                done = false;
                 nextMatches[y] = x;
                 nextMatchesInv[x] = y;
             }
@@ -77,6 +79,23 @@ abstract class CPII extends PIIBase {
             }
         }
 
-        return new Permutation(nextMatches, nextMatchesInv);
+        return new Pair<>(new Permutation(nextMatches, nextMatchesInv), done);
+    }
+
+    @Override
+    final Permutation iterationPhase(Prefs prefs, Permutation ks) {
+        return iterationPhaseImpl(prefs, ks).fst();
+    }
+
+    /** Count the # of iterations until convergence. `initial` is the initial men's matches */
+    final int countIters(Prefs prefs, Permutation initial) {
+        if (n != prefs.n()) throw new RuntimeException(); // TODO
+        Permutation curr = initial;
+        for (int i = 0; ; i++) {
+            var result = iterationPhaseImpl(prefs, curr);
+            if (result.snd())
+                return i;
+            curr = result.fst();
+        }
     }
 }
