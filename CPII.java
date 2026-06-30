@@ -32,17 +32,16 @@ class CPII extends PIIBase {
         final int n = prefs.n();
         int[] out = allUnmatched(n);
 
-        for (int y = 0; y < n; y++) {
-            for (int x = 0; x < n; x++) {
-                if (isUnstablePair(prefs, mensMatches, y, x)) {
-                    // System.out.printf("y=%d, x=%d unstable\n", y, x);
-                    int oldX = out[y];
-                    if (oldX == UNMATCHED || prefs.malePrefs(y, x) < prefs.malePrefs(y, oldX))
-                        out[y] = x;
+        for (int m = 0; m < n; m++) {
+            Permutation malePrefs = prefs.malePrefs()[m];
+            for (int rank = 0; rank < n; rank++) {
+                int w = malePrefs.getInverse(rank);
+                if (isUnstablePair(prefs, mensMatches, m, w)) {
+                    out[m] = w;
+                    break;
                 }
             }
         }
-
         return out;
     }
 
