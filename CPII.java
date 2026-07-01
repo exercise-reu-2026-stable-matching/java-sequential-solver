@@ -42,7 +42,7 @@ abstract class CPII extends PIIBase {
      */
     protected abstract int[] maleFemaleDominantUnstablePairs(Prefs prefs, int[] maleDominantUnstablePairs);
 
-    private record IterResult(Permutation mensMatches, boolean done) {}
+    private record IterResult(Permutation mensMatches, boolean done, int proposalsMade) {}
 
     // ks is like mensMatches. Returns (next permutation, done)
     private IterResult iterationPhaseImpl(Prefs prefs, Permutation ks) {
@@ -53,6 +53,11 @@ abstract class CPII extends PIIBase {
         // System.out.println("bs: " + Arrays.toString(bs));
         int[] cs = maleFemaleDominantUnstablePairs(prefs, bs);
         // System.out.println("cs: " + Arrays.toString(cs));
+
+        int proposalsMade = 0; // a.k.a. |B_i|
+        for (int w : bs)
+            if (w != UNMATCHED)
+                proposalsMade++;
         
         // start totally empty
         int[] nextMatches = allUnmatched(n);
@@ -81,7 +86,7 @@ abstract class CPII extends PIIBase {
             }
         }
 
-        return new IterResult(new Permutation(nextMatches, nextMatchesInv), done);
+        return new IterResult(new Permutation(nextMatches, nextMatchesInv), done, proposalsMade);
     }
 
     @Override
@@ -94,7 +99,7 @@ abstract class CPII extends PIIBase {
         if (n != prefs.n()) throw new RuntimeException(); // TODO
         Permutation curr = initial;
         for (int i = 0; ; i++) {
-            var result = iterationPhaseImpl(prefs, curr);
+            IterResult result = iterationPhaseImpl(prefs, curr);
             if (result.done())
                 return i;
             curr = result.mensMatches();
