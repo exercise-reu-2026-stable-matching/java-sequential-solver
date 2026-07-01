@@ -42,10 +42,10 @@ abstract class CPII extends PIIBase {
      */
     protected abstract int[] maleFemaleDominantUnstablePairs(Prefs prefs, int[] maleDominantUnstablePairs);
 
-    private record Result(Permutation mensMatches, boolean done) {}
+    private record IterResult(Permutation mensMatches, boolean done) {}
 
     // ks is like mensMatches. Returns (next permutation, done)
-    private Result iterationPhaseImpl(Prefs prefs, Permutation ks) {
+    private IterResult iterationPhaseImpl(Prefs prefs, Permutation ks) {
         if (n != prefs.n()) throw new RuntimeException(); // TODO
         
 
@@ -81,7 +81,7 @@ abstract class CPII extends PIIBase {
             }
         }
 
-        return new Result(new Permutation(nextMatches, nextMatchesInv), done);
+        return new IterResult(new Permutation(nextMatches, nextMatchesInv), done);
     }
 
     @Override
