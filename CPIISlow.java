@@ -11,9 +11,7 @@ class CPIISlow extends CPII {
         int[] out = allUnmatched(n);
 
         for (int m = 0; m < n; m++) {
-            Permutation malePrefs = prefs.malePrefs()[m];
-            for (int rank = 0; rank < n; rank++) {
-                int w = malePrefs.getInverse(rank);
+            for (int w = 0; w < n; w++) {
                 if (isUnstablePair(prefs, mensMatches, m, w)) {
                     out[m] = w;
                     break;
