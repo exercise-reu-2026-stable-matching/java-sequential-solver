@@ -42,7 +42,8 @@ abstract class CPII extends PIIBase {
      */
     protected abstract int[] maleFemaleDominantUnstablePairs(Prefs prefs, int[] maleDominantUnstablePairs);
 
-    private record IterResult(Permutation mensMatches, boolean done, int proposalsMade) {}
+    // NOTE this is dumb because `proposalsMade` always equals |B_i|
+    record IterResult(Permutation mensMatches, boolean done, int proposalsMade) {}
 
     // ks is like mensMatches. Returns (next permutation, done)
     private IterResult iterationPhaseImpl(Prefs prefs, Permutation ks) {
@@ -97,11 +98,15 @@ abstract class CPII extends PIIBase {
     /** Count the # of iterations until convergence. `initial` is the initial men's matches */
     final int countIters(Prefs prefs, Permutation initial) {
         if (n != prefs.n()) throw new RuntimeException(); // TODO
+        
         Permutation curr = initial;
         for (int i = 0; ; i++) {
             IterResult result = iterationPhaseImpl(prefs, curr);
-            if (result.done())
+            System.out.printf("%d ", result.proposalsMade());
+            if (result.done()) {
+                System.out.println();
                 return i;
+            }
             curr = result.mensMatches();
         }
     }
