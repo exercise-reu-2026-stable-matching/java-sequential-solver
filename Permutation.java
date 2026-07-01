@@ -16,7 +16,7 @@ class Permutation {
     }
 
     static Permutation allUnmatched(int n) {
-        return new Permutation(CPII.allUnmatched(n), CPII.allUnmatched(n));
+        return new Permutation(CPIISlow.allUnmatched(n), CPIISlow.allUnmatched(n));
     }
     
     Permutation(int[] perm) {
