@@ -42,8 +42,10 @@ abstract class CPII extends PIIBase {
      */
     protected abstract int[] maleFemaleDominantUnstablePairs(Prefs prefs, int[] maleDominantUnstablePairs);
 
+    private record Result(Permutation mensMatches, boolean done) {}
+
     // ks is like mensMatches. Returns (next permutation, done)
-    private Pair<Permutation, Boolean> iterationPhaseImpl(Prefs prefs, Permutation ks) {
+    private Result iterationPhaseImpl(Prefs prefs, Permutation ks) {
         if (n != prefs.n()) throw new RuntimeException(); // TODO
         
 
@@ -79,12 +81,12 @@ abstract class CPII extends PIIBase {
             }
         }
 
-        return new Pair<>(new Permutation(nextMatches, nextMatchesInv), done);
+        return new Result(new Permutation(nextMatches, nextMatchesInv), done);
     }
 
     @Override
     final Permutation iterationPhase(Prefs prefs, Permutation ks) {
-        return iterationPhaseImpl(prefs, ks).fst();
+        return iterationPhaseImpl(prefs, ks).mensMatches();
     }
 
     /** Count the # of iterations until convergence. `initial` is the initial men's matches */
@@ -93,9 +95,9 @@ abstract class CPII extends PIIBase {
         Permutation curr = initial;
         for (int i = 0; ; i++) {
             var result = iterationPhaseImpl(prefs, curr);
-            if (result.snd())
+            if (result.done())
                 return i;
-            curr = result.fst();
+            curr = result.mensMatches();
         }
     }
 }
