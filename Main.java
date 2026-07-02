@@ -75,6 +75,7 @@ class Main {
 
         while (PII.cycleCount < nIters || PII.convergeCount < nIters) {
             Prefs prefs = Prefs.random(rng, nSize);
+
             var piiResult = countCycles(pii, prefs, identity, nIters);
 
             // System.out.println(prefs);
@@ -92,6 +93,11 @@ class Main {
             nPIIConverging, nPIICycle, nItersForPIIOfConverging, nItersForPIIOfDiverging);
 
         // System.out.println(PII.stateDataList.get(0).toCSVString(programIndex));
-        PII.toCSV(writeFile, programIndex);
+
+        String iterWriteFile = writeFile + "_iter.csv";
+        PII.toIterCSV(iterWriteFile, programIndex);
+
+        String trialWriteFile = writeFile + "_trial.csv";
+        PII.toTrialCSV(trialWriteFile, nSize, programIndex);
     }
 }

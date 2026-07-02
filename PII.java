@@ -12,10 +12,13 @@ import java.util.Set;
 
 class PII extends PIIBase {
     private final Random rng;
-    public static final List<StateData> stateDataList = new ArrayList<>();
-    private static StateData currentStateData;
+    public static final List<IterationStateData> itrStateDataList = new ArrayList<>();
+    private static IterationStateData currentItrStateData;
+
+    public static final List<TrialStateData> trialStateDataList = new ArrayList<>();
 
     public static int trialIndex = 0;
+    public static int iterationIndex = 0;
     public static int convergeCount = 0;
     public static int cycleCount = 0;
 
@@ -51,7 +54,7 @@ class PII extends PIIBase {
             rev.put(v, k);
         }
 
-        currentStateData.addNM2_gen(out.values());
+        currentItrStateData.addNM2_gen(out.values());
 
         return out;
     }
@@ -129,7 +132,7 @@ class PII extends PIIBase {
             }
         }
 
-        currentStateData.addNM2Graph(out);
+        currentItrStateData.addNM2Graph(out);
         return out;
     }
 
@@ -208,8 +211,8 @@ class PII extends PIIBase {
                     nm2GeneratingPairsAssociatedWithMatchingPair(mensMatches, 
                         nm2GeneratingPairs(mensMatches, nm1Pairs))));
 
-        currentStateData.addNM1(nm1Pairs);
-        currentStateData.addNM2(nmPairs);
+        currentItrStateData.addNM1(nm1Pairs);
+        currentItrStateData.addNM2(nmPairs);
 
         checkNMPairs(n, nm1Pairs, nmPairs);
         nmPairs.addAll(nm1Pairs);
@@ -233,17 +236,20 @@ class PII extends PIIBase {
     public Permutation iterationPhase(Prefs prefs, Permutation mensMatches) {
         prefs.checkPermLength(mensMatches);
 
-        currentStateData = new StateData(prefs);
-        stateDataList.add(currentStateData);
+        currentItrStateData = new IterationStateData(trialIndex, iterationIndex);
+        itrStateDataList.add(currentItrStateData);
 
-        currentStateData.addMatching(mensMatches.toIndices(), mensMatches);
-        currentStateData.addUnstable(prefs.unstablePairs(mensMatches));
+        currentItrStateData.addMatching(mensMatches.toIndices());
+        currentItrStateData.addUnstable(prefs.unstablePairs(mensMatches));
 
         List<Index> nm1Pairs = prefs.nm1Pairs(mensMatches, prefs.nm1GeneratingPairs(mensMatches));
+
+        iterationIndex++;
         return iterationPhase(mensMatches, nm1Pairs);
     }
 
     public Pair<Optional<Permutation>, Integer> runOrCycle(Prefs prefs, Permutation initial, int nIters) {
+        iterationIndex = 0;
 
         Pair<Optional<Permutation>, Integer> runOrCyclePair = runOrCycle(prefs, initial);
         Optional<Permutation> stablePerm = runOrCyclePair.fst();
@@ -251,58 +257,66 @@ class PII extends PIIBase {
         int iters = runOrCyclePair.snd();
 
         if (converges && convergeCount < nIters) {
-            addTrialData(converges, iters);
             convergeCount++;
+            trialStateDataList.add(new TrialStateData(trialIndex, prefs, converges));
             // System.out.printf("Trial index: %d (%b)\n", PII.trialIndex, converges);
         }
         else if (!converges && cycleCount < nIters) {
-            addTrialData(converges, iters);
             cycleCount++;
+            trialStateDataList.add(new TrialStateData(trialIndex, prefs, converges));
             // System.out.printf("Trial index: %d (%b)\n", PII.trialIndex, converges);
         }
         else {
-            deleteStateData(iters);
+            deleteLastStateData(iters);
         }
 
         trialIndex++;
         return runOrCyclePair;
     }
 
-    private void addTrialData(boolean converges, int iters) {
+    private void deleteLastStateData(int iters) {
         for (int i = 1; i <= iters; i++) {
-            StateData stateData = stateDataList.get(stateDataList.size() - i);
-            stateData.converges = converges;
-            stateData.trialIndex = trialIndex;
+            itrStateDataList.removeLast();
         }
     }
 
-    private void deleteStateData(int iters) {
-        for (int i = 1; i <= iters; i++) {
-            stateDataList.removeLast();
-        }
-    }
-
-    public static void toCSV(String filename, int programIndex) {
+    public static void toIterCSV(String filename, int programIndex) {
         try (PrintWriter printWriter = new PrintWriter(filename)) {
             // Create CSV headers
             StringBuilder builder = new StringBuilder();
-            builder.append("programIndex,trialIndex,numUnstable,numNM1,numNM2,");
-
-            builder.append("matchingAM,matchingGM,");
-            String[] pairNames = {"unstable", "nm1", "nm2Gen", "nm2"};
-            for (String pairName : pairNames) {
-                builder.append(pairName).append("AM,");
-                builder.append(pairName).append("GM,");
-                builder.append(pairName).append("RAM,");
-            }
-
+            builder.append("programIndex,trialIndex,iterationIndex,numUnstable,numNM1,numNM2,");
             builder.append("numEdges,numSingletons,numChains,numCycles,");
-            builder.append("avgChainLen,avgCycleLen,converges");
+            builder.append("avgChainLen,avgCycleLen,");
+            builder.append("matchIndices,unstableIndices,nm1Indices,nm2GenIndices,nm2Indices");
 
             printWriter.println(builder.toString());
 
             // Write CSV line for each state
-            for (StateData stateData : stateDataList) {
+            for (IterationStateData stateData : itrStateDataList) {
+                printWriter.println(stateData.toCSVString(programIndex));
+            }
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException("File " + filename + " not found!");
+        }
+    }
+
+    public static void toTrialCSV(String filename, int n, int programIndex) {
+        try (PrintWriter printWriter = new PrintWriter(filename)) {
+            // Create CSV headers
+            StringBuilder builder = new StringBuilder();
+            builder.append("programIndex,trialIndex,");
+
+            for (int i = 0; i < n*n; i++) {
+                builder.append("l").append(i).append(",");
+                builder.append("r").append(i).append(",");
+            }
+
+            builder.append("converges");
+            printWriter.println(builder.toString());
+
+            // Write CSV line for each state
+            for (TrialStateData stateData : trialStateDataList) {
                 printWriter.println(stateData.toCSVString(programIndex));
             }
         }
