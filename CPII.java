@@ -1,3 +1,5 @@
+import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -105,14 +107,37 @@ abstract class CPII extends PIIBase {
         return iterationPhaseImpl(prefs, ks).fst();
     }
 
+    private static final int numMatched(Permutation p) {
+        int count = 0;
+        for (int w : p.perm)
+            if (w != UNMATCHED)
+                count++;
+        return count;
+    }
+
+    static final BufferedOutputStream out = new BufferedOutputStream(System.out);
+
+    private static void printf(String format, Object... args) throws IOException {
+        out.write(String.format(format, args).getBytes());
+    }
+
     /** Count the # of iterations until convergence. `initial` is the initial men's matches */
-    final int countIters(Prefs prefs, Permutation initial) {
+    final int countIters(Prefs prefs, Permutation initial) throws IOException {
         if (n != prefs.n()) throw new RuntimeException(); // TODO
         Permutation curr = initial;
+        // long totalBSize = 0;
         for (int i = 0; ; i++) {
+            final int kSize = numMatched(curr);
+            final int bSize = n - kSize;
+            printf("%d\n", bSize);
+
             var result = iterationPhaseImpl(prefs, curr);
-            if (result.snd())
+            if (result.snd()) {
+                // if (i != 0)
+                //     printf("%.3f\n", totalBSize / (double)i);
                 return i;
+            }
+            // totalBSize += bSize;
             curr = result.fst();
         }
     }
