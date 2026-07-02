@@ -60,8 +60,10 @@ abstract class CPII extends PIIBase {
      */
     protected abstract int[] maleFemaleDominantUnstablePairs(Prefs prefs, int[] maleDominantUnstablePairs);
 
+    record IterResult(Permutation next, boolean done) {}
+
     // ks is like mensMatches. Returns (next permutation, done)
-    private Pair<Permutation, Boolean> iterationPhaseImpl(Prefs prefs, Permutation ks) {
+    private IterResult iterationPhaseImpl(Prefs prefs, Permutation ks) {
         if (n != prefs.n()) throw new RuntimeException(); // TODO
         
 
@@ -86,7 +88,6 @@ abstract class CPII extends PIIBase {
             }
         }
 
-        int rCount = 0;
         // add each element of K_i as long as it doesn't share a member with a pair in C_i
         for (int y = 0; y < n; y++) {
             int x = ks.get(y);
@@ -95,16 +96,15 @@ abstract class CPII extends PIIBase {
                 nextMatches[y] = x;
                 assert nextMatchesInv[x] == UNMATCHED;
                 nextMatchesInv[x] = y;
-            } else
-                rCount++;
+            }
         }
 
-        return new Pair<>(new Permutation(nextMatches, nextMatchesInv), done);
+        return new IterResult(new Permutation(nextMatches, nextMatchesInv), done);
     }
 
     @Override
     final Permutation iterationPhase(Prefs prefs, Permutation ks) {
-        return iterationPhaseImpl(prefs, ks).fst();
+        return iterationPhaseImpl(prefs, ks).next();
     }
 
     private static final int numMatched(Permutation p) {
@@ -129,16 +129,16 @@ abstract class CPII extends PIIBase {
         for (int i = 0; ; i++) {
             final int kSize = numMatched(curr);
             final int bSize = n - kSize;
-            printf("%d\n", bSize);
+            printf("%d,%d,%d\n", n, i, bSize);
 
             var result = iterationPhaseImpl(prefs, curr);
-            if (result.snd()) {
+            if (result.done()) {
                 // if (i != 0)
                 //     printf("%.3f\n", totalBSize / (double)i);
                 return i;
             }
             // totalBSize += bSize;
-            curr = result.fst();
+            curr = result.next();
         }
     }
 }
