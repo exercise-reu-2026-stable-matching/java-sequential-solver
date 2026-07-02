@@ -59,9 +59,15 @@ abstract class CPII extends PIIBase {
     protected abstract int[] maleFemaleDominantUnstablePairs(Prefs prefs, int[] maleDominantUnstablePairs);
 
     // ks is like mensMatches. Returns (next permutation, done)
-    final Pair<Permutation, Boolean> iterationPhaseImpl(Prefs prefs, Permutation ks, int[] bs, int[] cs) {
+    private Pair<Permutation, Boolean> iterationPhaseImpl(Prefs prefs, Permutation ks) {
         if (n != prefs.n()) throw new RuntimeException(); // TODO
+        
 
+        int[] bs = maleDominantUnstablePairs(prefs, ks);
+        // System.out.println("bs: " + Arrays.toString(bs));
+        int[] cs = maleFemaleDominantUnstablePairs(prefs, bs);
+        // System.out.println("cs: " + Arrays.toString(cs));
+        
         // start totally empty
         int[] nextMatches = allUnmatched(n);
         int[] nextMatchesInv = allUnmatched(n);
@@ -92,12 +98,6 @@ abstract class CPII extends PIIBase {
         }
 
         return new Pair<>(new Permutation(nextMatches, nextMatchesInv), done);
-    }
-
-    final Pair<Permutation, Boolean> iterationPhaseImpl(Prefs prefs, Permutation ks) {
-        int[] bs = maleDominantUnstablePairs(prefs, ks);
-        int[] cs = maleFemaleDominantUnstablePairs(prefs, bs);
-        return iterationPhaseImpl(prefs, ks, bs, cs);
     }
 
     @Override
