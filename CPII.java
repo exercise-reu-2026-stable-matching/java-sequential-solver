@@ -60,17 +60,27 @@ abstract class CPII extends PIIBase {
      */
     protected abstract int[] maleFemaleDominantUnstablePairs(Prefs prefs, int[] maleDominantUnstablePairs);
 
-    record IterResult(Permutation next, boolean done) {}
+    record IterResult(Permutation next, boolean done, int sCount) {}
 
     // ks is like mensMatches. Returns (next permutation, done)
     private IterResult iterationPhaseImpl(Prefs prefs, Permutation ks) {
         if (n != prefs.n()) throw new RuntimeException(); // TODO
         
 
+        // by row
         int[] bs = maleDominantUnstablePairs(prefs, ks);
-        // System.out.println("bs: " + Arrays.toString(bs));
+        // by column!
         int[] cs = maleFemaleDominantUnstablePairs(prefs, bs);
-        // System.out.println("cs: " + Arrays.toString(cs));
+
+        int sCount = 0; // sCount is |S_i|, the number of (single, single) pairs in C_i
+        for (int w = 0; w < n; w++) {
+            int m = cs[w];
+            if (m == UNMATCHED) continue; // not actually in C_i
+            
+            assert ks.get(m) == UNMATCHED; // it is a theorem that a man cannot be in K_i and C_i
+            if (ks.getInverse(w) == UNMATCHED)
+                sCount++;
+        }
         
         // start totally empty
         int[] nextMatches = allUnmatched(n);
@@ -99,7 +109,7 @@ abstract class CPII extends PIIBase {
             }
         }
 
-        return new IterResult(new Permutation(nextMatches, nextMatchesInv), done);
+        return new IterResult(new Permutation(nextMatches, nextMatchesInv), done, sCount);
     }
 
     @Override
@@ -137,6 +147,9 @@ abstract class CPII extends PIIBase {
                 //     printf("%.3f\n", totalBSize / (double)i);
                 return i;
             }
+
+            // It is a theorem that |S_i| = |K_{i+1}| - |K_i|
+            assert result.sCount() == numMatched(result.next()) - numMatched(curr);
             // totalBSize += bSize;
             curr = result.next();
         }
