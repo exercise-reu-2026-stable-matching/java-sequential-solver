@@ -139,7 +139,7 @@ abstract class CPII extends PIIBase {
         for (int i = 0; ; i++) {
             final int kSize = numMatched(curr);
             final int bSize = n - kSize;
-            printf("%d,%d,%d\n", n, i, bSize);
+            printf("%d,%d,%d\n", n, i + 1, bSize);
 
             var result = iterationPhaseImpl(prefs, curr);
             if (result.done()) {
