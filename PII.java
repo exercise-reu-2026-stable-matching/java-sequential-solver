@@ -1,4 +1,3 @@
-import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -280,48 +279,88 @@ class PII extends PIIBase {
         }
     }
 
-    public static void toIterCSV(String filename, int programIndex) {
-        try (PrintWriter printWriter = new PrintWriter(filename)) {
-            // Create CSV headers
-            StringBuilder builder = new StringBuilder();
-            builder.append("programIndex,trialIndex,iterationIndex,numUnstable,numNM1,numNM2,");
-            builder.append("numEdges,numSingletons,numChains,numCycles,");
-            builder.append("avgChainLen,avgCycleLen,");
-            builder.append("matchIndices,unstableIndices,nm1Indices,nm2GenIndices,nm2Indices");
+    public static void writeCSVHeaders(PrintWriter iterWriter, PrintWriter trialWriter, int n) {
+        // Create iteration CSV headers
+        StringBuilder builder = new StringBuilder();
+        builder.append("programIndex,trialIndex,iterationIndex,numUnstable,numNM1,numNM2,");
+        builder.append("numEdges,numSingletons,numChains,numCycles,");
+        builder.append("avgChainLen,avgCycleLen,");
+        builder.append("matchIndices,unstableIndices,nm1Indices,nm2GenIndices,nm2Indices");
 
-            printWriter.println(builder.toString());
+        iterWriter.println(builder.toString());
 
-            // Write CSV line for each state
+        // Create trial CSV headers
+        builder.setLength(0);
+        builder.append("programIndex,trialIndex,");
+
+        for (int i = 0; i < n*n; i++) {
+            builder.append("l").append(i).append(",");
+            builder.append("r").append(i).append(",");
+        }
+
+        builder.append("converges");
+        trialWriter.println(builder.toString());
+    }
+
+    public static void bufferWriteCSV(PrintWriter iterWriter, PrintWriter trialWriter, int programIndex, int maxBuffer) {
+        if (itrStateDataList.size() >= maxBuffer) {
+            // Write iteration CSV line for each state
             for (IterationStateData stateData : itrStateDataList) {
-                printWriter.println(stateData.toCSVString(programIndex));
+                iterWriter.println(stateData.toCSVString(programIndex));
             }
-        }
-        catch (FileNotFoundException e) {
-            throw new RuntimeException("File " + filename + " not found!");
-        }
-    }
-
-    public static void toTrialCSV(String filename, int n, int programIndex) {
-        try (PrintWriter printWriter = new PrintWriter(filename)) {
-            // Create CSV headers
-            StringBuilder builder = new StringBuilder();
-            builder.append("programIndex,trialIndex,");
-
-            for (int i = 0; i < n*n; i++) {
-                builder.append("l").append(i).append(",");
-                builder.append("r").append(i).append(",");
-            }
-
-            builder.append("converges");
-            printWriter.println(builder.toString());
-
-            // Write CSV line for each state
+    
+            // Write trial CSV line for each state
             for (TrialStateData stateData : trialStateDataList) {
-                printWriter.println(stateData.toCSVString(programIndex));
+                trialWriter.println(stateData.toCSVString(programIndex));
             }
-        }
-        catch (FileNotFoundException e) {
-            throw new RuntimeException("File " + filename + " not found!");
+
+            itrStateDataList.clear();
+            trialStateDataList.clear();
         }
     }
+
+    // public static void toIterCSV(String filename, int programIndex) {
+    //     try (PrintWriter printWriter = new PrintWriter(filename)) {
+    //         // Create CSV headers
+    //         StringBuilder builder = new StringBuilder();
+    //         builder.append("programIndex,trialIndex,iterationIndex,numUnstable,numNM1,numNM2,");
+    //         builder.append("numEdges,numSingletons,numChains,numCycles,");
+    //         builder.append("avgChainLen,avgCycleLen,");
+    //         builder.append("matchIndices,unstableIndices,nm1Indices,nm2GenIndices,nm2Indices");
+
+    //         printWriter.println(builder.toString());
+
+    //         // Write CSV line for each state
+    //         for (IterationStateData stateData : itrStateDataList) {
+    //             printWriter.println(stateData.toCSVString(programIndex));
+    //         }
+    //     }
+    //     catch (FileNotFoundException e) {
+    //         throw new RuntimeException("File " + filename + " not found!");
+    //     }
+    // }
+
+    // public static void toTrialCSV(String filename, int n, int programIndex) {
+    //     try (PrintWriter printWriter = new PrintWriter(filename)) {
+    //         // Create CSV headers
+    //         StringBuilder builder = new StringBuilder();
+    //         builder.append("programIndex,trialIndex,");
+
+    //         for (int i = 0; i < n*n; i++) {
+    //             builder.append("l").append(i).append(",");
+    //             builder.append("r").append(i).append(",");
+    //         }
+
+    //         builder.append("converges");
+    //         printWriter.println(builder.toString());
+
+    //         // Write CSV line for each state
+    //         for (TrialStateData stateData : trialStateDataList) {
+    //             printWriter.println(stateData.toCSVString(programIndex));
+    //         }
+    //     }
+    //     catch (FileNotFoundException e) {
+    //         throw new RuntimeException("File " + filename + " not found!");
+    //     }
+    // }
 }

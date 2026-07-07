@@ -1,3 +1,5 @@
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -63,8 +65,10 @@ class Main {
         final int nIters       = Integer.parseInt(args[0]);
         final int nSize        = Integer.parseInt(args[1]);
         final String writeFile = args[2];
-        
+
         final int programIndex = args.length >= 4 ? Integer.parseInt(args[3]) : 0;
+
+        final int maxStateBuffer = 100000;
 
         PII pii = new PII();
 
@@ -73,20 +77,32 @@ class Main {
 
         long nPIIConverging = 0, nPIICycle = 0, nItersForPIIOfConverging = 0, nItersForPIIOfDiverging = 0;
 
-        while (PII.cycleCount < nIters || PII.convergeCount < nIters) {
-            Prefs prefs = Prefs.random(rng, nSize);
+        try (
+            PrintWriter iterWriter = new PrintWriter(writeFile + "_iter.csv");
+            PrintWriter trialWriter = new PrintWriter(writeFile + "_trial.csv")
+        ) {
+            PII.writeCSVHeaders(iterWriter, trialWriter, nSize);
 
-            var piiResult = countCycles(pii, prefs, identity, nIters);
+            while (PII.cycleCount < nIters || PII.convergeCount < nIters) {
+                Prefs prefs = Prefs.random(rng, nSize);
 
-            // System.out.println(prefs);
+                Pair<Boolean, Integer> piiResult = countCycles(pii, prefs, identity, nIters);
 
-            if (piiResult.fst()) {
-                nPIIConverging++;
-                nItersForPIIOfConverging += piiResult.snd();
-            } else {
-                nPIICycle++;
-                nItersForPIIOfDiverging += piiResult.snd();
+                if (piiResult.fst()) {
+                    nPIIConverging++;
+                    nItersForPIIOfConverging += piiResult.snd();
+                } else {
+                    nPIICycle++;
+                    nItersForPIIOfDiverging += piiResult.snd();
+                }
+
+                PII.bufferWriteCSV(iterWriter, trialWriter, programIndex, maxStateBuffer);
             }
+
+            PII.bufferWriteCSV(iterWriter, trialWriter, programIndex, 1);
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException("File " + writeFile + "_iter.csv" + " not found!");
         }
 
         System.out.printf("%d,%d,%d,%d\n", 
@@ -94,10 +110,10 @@ class Main {
 
         // System.out.println(PII.stateDataList.get(0).toCSVString(programIndex));
 
-        String iterWriteFile = writeFile + "_iter.csv";
-        PII.toIterCSV(iterWriteFile, programIndex);
+        // String iterWriteFile = writeFile + "_iter.csv";
+        // PII.toIterCSV(iterWriteFile, programIndex);
 
-        String trialWriteFile = writeFile + "_trial.csv";
-        PII.toTrialCSV(trialWriteFile, nSize, programIndex);
+        // String trialWriteFile = writeFile + "_trial.csv";
+        // PII.toTrialCSV(trialWriteFile, nSize, programIndex);
     }
 }

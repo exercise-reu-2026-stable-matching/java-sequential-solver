@@ -24,7 +24,8 @@
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}",
-            "vmArgs": "-ea"
+            "vmArgs": "-ea",
+            "args": "10 10 test_buffer"
         }
     ]
 }
