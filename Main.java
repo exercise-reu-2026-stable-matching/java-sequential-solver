@@ -11,6 +11,7 @@ class Main {
 
         // Buffer to avoid overhead of System.out.println each time
         for (int i = 0; i < nSamples; i++) {
+            System.err.println("Sample " + i);
             final Prefs prefs = Prefs.random(rng, nSize);
 
             CPII fast = new CPIIFast(nSize);

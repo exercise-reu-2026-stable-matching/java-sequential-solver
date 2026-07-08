@@ -125,6 +125,16 @@ abstract class CPII extends PIIBase {
         return count;
     }
 
+    // slow
+    private static final int numUnstable(Prefs prefs, Permutation p) {
+        int count = 0;
+        for (int m = 0; m < p.size(); m++)
+            for (int w = 0; w < p.size(); w++)
+                if (prefs.isUnstablePair(p, m, w))
+                    count++;
+        return count;
+    }
+
     static final BufferedOutputStream out = new BufferedOutputStream(System.out);
 
     private static void printf(String format, Object... args) throws IOException {
@@ -137,12 +147,16 @@ abstract class CPII extends PIIBase {
         Permutation curr = initial;
         // long totalBSize = 0;
         for (int i = 0; ; i++) {
+            // final int aSize = numUnstable(prefs, curr);
             final int kSize = numMatched(curr);
             final int bSize = n - kSize;
             printf("%d,%d,%d\n", n, i + 1, bSize);
 
             var result = iterationPhaseImpl(prefs, curr);
             if (result.done()) {
+                // Pad completed runs with zeroes
+                for (int j = i + 1; j < n * n; j++)
+                    printf("%d,%d,%d\n", n, j + 1, 0);
                 // if (i != 0)
                 //     printf("%.3f\n", totalBSize / (double)i);
                 return i;
