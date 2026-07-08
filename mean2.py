@@ -17,4 +17,4 @@ for line in sys.stdin:
    
 print("i,|B_i|/n") 
 for k in sorted(sizes.keys()):
-    print(f"{k},{sizes[k][0] / sizes[k][1] / n:.5f}", flush=True)
+    print(f"{k},{sizes[k][0] / sizes[k][1] / n:.10f}", flush=True)
