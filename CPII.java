@@ -154,9 +154,6 @@ abstract class CPII extends PIIBase {
 
             var result = iterationPhaseImpl(prefs, curr);
             if (result.done()) {
-                // Pad completed runs with zeroes
-                for (int j = i + 1; j < n * n; j++)
-                    printf("%d,%d,%d\n", n, j + 1, 0);
                 // if (i != 0)
                 //     printf("%.3f\n", totalBSize / (double)i);
                 return i;
