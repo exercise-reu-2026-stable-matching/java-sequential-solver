@@ -1,0 +1,5 @@
+#!/bin/zsh
+
+OUT=../simple-solver-java.zip
+rm -f $OUT
+zip -r $OUT . -x ".git/*" -x "compressed-output/*"
