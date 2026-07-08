@@ -9,7 +9,6 @@ class Main {
         final int nSamples = Integer.parseInt(args[1]);
         final Permutation initial = Permutation.allUnmatched(nSize);
 
-        // Buffer to avoid overhead of System.out.println each time
         for (int i = 0; i < nSamples; i++) {
             System.err.println("Sample " + i);
             final Prefs prefs = Prefs.random(rng, nSize);
