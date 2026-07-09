@@ -255,6 +255,11 @@ class PII extends PIIBase {
         boolean converges = stablePerm.isPresent();
         int iters = runOrCyclePair.snd();
 
+        // Edge case where initial matching was stable; avoids adding trial without iterations
+        if (iters == 0) {
+            return runOrCyclePair;
+        }
+
         if (converges && convergeCount < nIters) {
             convergeCount++;
             trialStateDataList.add(new TrialStateData(trialIndex, prefs, converges));
