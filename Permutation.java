@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import java.util.stream.Stream;
@@ -16,7 +18,7 @@ class Permutation {
     }
 
     static Permutation allUnmatched(int n) {
-        return new Permutation(CPIISlow.allUnmatched(n), CPIISlow.allUnmatched(n));
+        return new Permutation(CPII.allUnmatched(n), CPII.allUnmatched(n));
     }
     
     Permutation(int[] perm) {
@@ -55,6 +57,10 @@ class Permutation {
 
     int getInverse(int index) {
         return inversePerm[index];
+    }
+
+    Permutation inverse() {
+        return new Permutation(this.inversePerm, this.perm);
     }
 
     static Permutation random(Random rng, int n) {
@@ -117,6 +123,16 @@ class Permutation {
         int tmp = arr[i];
         arr[i] = arr[j];
         arr[j] = tmp;
+    }
+
+    public List<Index> toIndices() {
+        List<Index> indices = new ArrayList<>();
+        for (int y = 0; y < perm.length; y++) {
+            if (perm[y] != -1) {
+                indices.add(new Index(y, perm[y]));
+            }
+        }
+        return indices;
     }
 
     /** The next permutation in the left-to-right lexicographic ordering, returning `null` once the end is reached.

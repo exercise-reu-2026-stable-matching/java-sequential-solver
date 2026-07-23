@@ -43,7 +43,7 @@ abstract class CPII extends PIIBase {
     protected abstract int[] maleFemaleDominantUnstablePairs(Prefs prefs, int[] maleDominantUnstablePairs);
 
     // ks is like mensMatches. Returns (next permutation, done)
-    private Pair<Permutation, Boolean> iterationPhaseImpl(Prefs prefs, Permutation ks) {
+    protected Pair<Permutation, Boolean> iterationPhaseImpl(Prefs prefs, Permutation ks) {
         if (n != prefs.n()) throw new RuntimeException(); // TODO
         
 
@@ -88,7 +88,7 @@ abstract class CPII extends PIIBase {
     }
 
     /** Count the # of iterations until convergence. `initial` is the initial men's matches */
-    final int countIters(Prefs prefs, Permutation initial) {
+    int countIters(Prefs prefs, Permutation initial) {
         if (n != prefs.n()) throw new RuntimeException(); // TODO
         Permutation curr = initial;
         for (int i = 0; ; i++) {

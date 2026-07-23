@@ -2,6 +2,10 @@
 record Index(int y, int x) {
     @Override 
     public String toString() {
-        return "(" + y + ", " + x + ")";
+        return "(" + y + "," + x + ")";
+    }
+
+    public Index transpose() {
+        return new Index(x, y);
     }
 }

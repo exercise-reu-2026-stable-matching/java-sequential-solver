@@ -84,6 +84,10 @@ record Prefs(Permutation[] malePrefs, Permutation[] femalePrefs) {
         return malePrefs.length;
     }
 
+    public Prefs maleFemaleSwap() {
+        return new Prefs(femalePrefs, malePrefs);
+    }
+
     /** Print out the preferences matrix with 1-indexed preferences */
     @Override
     public String toString() {

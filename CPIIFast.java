@@ -4,7 +4,7 @@ class CPIIFast extends CPII {
      * we already considered and broke up with. This and ignoring women who won't ever match with us should take the total runtime from O(n^2) per iteration
      * to O(n^2) total
       */
-    private final int[] maleCurrentProposalRanks;
+    protected final int[] maleCurrentProposalRanks;
 
     CPIIFast(int n) {
         super(n);
