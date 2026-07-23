@@ -38,8 +38,8 @@ class Main {
                 final Prefs prefs = Prefs.random(rng, nSize);
                 final Prefs swappedPrefs = prefs.maleFemaleSwap();
 
-                System.out.println(prefs);
-                System.out.println("\n");
+                // System.out.println(prefs);
+                // System.out.println("\n");
 
                 int mfIterations = cpiiMF.countIters(prefs, initial, trial);
                 int fmIterations = cpiiFM.countIters(swappedPrefs, initial, trial);
