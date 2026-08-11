@@ -39,7 +39,7 @@ Juniper Pasternak
 juniper.pasternak23@kzoo.edu
 ## Acknowledgements
 
-Thank you to William Bradley and Jeffery Xu for their Java sequential solver implementation of PII.
+Thank you to William Bradley and Jeffrey Xu for their Java sequential solver implementation of PII.
 
 ## License
 
