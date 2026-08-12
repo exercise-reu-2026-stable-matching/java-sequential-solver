@@ -1,6 +1,6 @@
 # Java Sequential Solver - Mean State Data Collection
 
-The Java Sequential Solver contains a sequential implementation of the PII algorithm. This is used as an input data generator that is used in conjunction with [PII Cycle Prediction](https://github.com/exercise-reu-2026-stable-matching/pii-state-data-ml). This is the *mean-state-data-collection* branch, which is used to generate data for the mean models for PII Cycle Prediction.
+The Java Sequential Solver contains a sequential implementation of the PII algorithm. This is used as an input data generator that is used in conjunction with [PII Cycle Prediction](https://github.com/exercise-reu-2026-stable-matching/pii-ml). This is the *mean-state-data-collection* branch, which is used to generate data for the mean models for PII Cycle Prediction.
 
 ## Usage
 
