@@ -1,0 +1,12 @@
+#!/bin/zsh
+
+NSAMPLES=10000
+
+javac Main.java &&
+
+printf "n,E_i[|B_i|]\n"
+for i in {1..100}
+do
+    mean=$(java Main $i $NSAMPLES | ./mean.py)
+    printf "%d,%f\n" $i $mean
+done

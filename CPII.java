@@ -1,4 +1,7 @@
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 abstract class CPII extends PIIBase {
     protected static final int UNMATCHED = -1;
@@ -35,6 +38,20 @@ abstract class CPII extends PIIBase {
             && (matchedMan == UNMATCHED   || prefs.femalePrefs(x, y) < prefs.femalePrefs(x, matchedMan));
     }
 
+    static List<Index> unstablePairs(Prefs prefs, Permutation mensMatches) {
+        final int n = prefs.n();
+        List<Index> out = new ArrayList<>();
+
+        for (int y = 0; y < n; y++) {
+            for (int x = 0; x < n; x++) {
+                if (isUnstablePair(prefs, mensMatches, y, x))
+                    out.add(new Index(y, x));
+            }
+        }
+
+        return out;
+    }
+
     /** Return the male-dominant unstable pair for each row, or -1 if no such pair exists */
     protected abstract int[] maleDominantUnstablePairs(Prefs prefs, Permutation mensMatches);
 
@@ -42,12 +59,28 @@ abstract class CPII extends PIIBase {
      */
     protected abstract int[] maleFemaleDominantUnstablePairs(Prefs prefs, int[] maleDominantUnstablePairs);
 
-    record IterResult(Permutation next, boolean done) {}
+    record IterResult(Permutation next, boolean done, int sCount) {}
 
     // ks is like mensMatches. Returns (next permutation, done)
-    private IterResult iterationPhaseImpl(Prefs prefs, Permutation ks, int[] bs, int[] cs) {
+    private IterResult iterationPhaseImpl(Prefs prefs, Permutation ks) {
         if (n != prefs.n()) throw new RuntimeException(); // TODO
+        
 
+        // by row
+        int[] bs = maleDominantUnstablePairs(prefs, ks);
+        // by column!
+        int[] cs = maleFemaleDominantUnstablePairs(prefs, bs);
+
+        int sCount = 0; // sCount is |S_i|, the number of (single, single) pairs in C_i
+        for (int w = 0; w < n; w++) {
+            int m = cs[w];
+            if (m == UNMATCHED) continue; // not actually in C_i
+            
+            assert ks.get(m) == UNMATCHED; // it is a theorem that a man cannot be in K_i and C_i
+            if (ks.getInverse(w) == UNMATCHED)
+                sCount++;
+        }
+        
         // start totally empty
         int[] nextMatches = allUnmatched(n);
         int[] nextMatchesInv = allUnmatched(n);
@@ -75,13 +108,7 @@ abstract class CPII extends PIIBase {
             }
         }
 
-        return new IterResult(new Permutation(nextMatches, nextMatchesInv), done);
-    }
-
-    final IterResult iterationPhaseImpl(Prefs prefs, Permutation ks) {
-        int[] bs = maleDominantUnstablePairs(prefs, ks);
-        int[] cs = maleFemaleDominantUnstablePairs(prefs, bs);
-        return iterationPhaseImpl(prefs, ks, bs, cs);
+        return new IterResult(new Permutation(nextMatches, nextMatchesInv), done, sCount);
     }
 
     @Override
@@ -89,14 +116,54 @@ abstract class CPII extends PIIBase {
         return iterationPhaseImpl(prefs, ks).next();
     }
 
+    private static final int numMatched(Permutation p) {
+        int count = 0;
+        for (int w : p.perm)
+            if (w != UNMATCHED)
+                count++;
+        return count;
+    }
+
+    // slow
+    private static final int numUnstable(Prefs prefs, Permutation p) {
+        int count = 0;
+        for (int m = 0; m < p.size(); m++)
+            for (int w = 0; w < p.size(); w++)
+                if (prefs.isUnstablePair(p, m, w))
+                    count++;
+        return count;
+    }
+
+    // static final BufferedOutputStream out = new BufferedOutputStream(System.out);
+
+    // private static void printf(String format, Object... args) throws IOException {
+    //     out.write(String.format(format, args).getBytes());
+    //     out.flush();
+    // }
+
     /** Count the # of iterations until convergence. `initial` is the initial men's matches */
-    final int countIters(Prefs prefs, Permutation initial) {
+    final int countIters(Prefs prefs, Permutation initial) throws IOException {
         if (n != prefs.n()) throw new RuntimeException(); // TODO
         Permutation curr = initial;
+        // long totalBSize = 0;
         for (int i = 0; ; i++) {
+            // final int aSize = numUnstable(prefs, curr);
+            // final int kSize = numMatched(curr);
+            // final int bSize = n - kSize;
+            // assert bSize * bSize <= aSize;
+            // printf("%d,%d,%d,%d\n", n, i + 1, aSize, bSize);
+            // if (i > 0) assert 2 * bSize * bSize <= aSize;
+
             var result = iterationPhaseImpl(prefs, curr);
-            if (result.done())
+            if (result.done()) {
+                // if (i != 0)
+                //     printf("%.3f\n", totalBSize / (double)i);
                 return i;
+            }
+
+            // It is a theorem that |S_i| = |K_{i+1}| - |K_i|
+            assert result.sCount() == numMatched(result.next()) - numMatched(curr);
+            // totalBSize += bSize;
             curr = result.next();
         }
     }

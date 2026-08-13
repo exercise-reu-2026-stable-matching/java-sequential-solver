@@ -5,8 +5,8 @@ import java.util.stream.Stream;
 
 /** A permutation on [0, n) */
 class Permutation {
-    private final int[] perm;
-    private final int[] inversePerm;
+    final int[] perm;
+    final int[] inversePerm;
 
     // TODO encapsulate, worry about invariant, etc.
     /** Record constructor, no checks */
