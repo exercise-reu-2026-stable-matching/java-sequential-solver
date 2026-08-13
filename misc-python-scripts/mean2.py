@@ -3,7 +3,7 @@
 import sys
 from collections import defaultdict
 
-N_SAMPLES = 1000
+N_SAMPLES = 1000000
 # for each i, sum of |B_i| over all samples
 b_sizes_total = defaultdict(lambda: 0)
 
@@ -17,4 +17,4 @@ for line in sys.stdin:
    
 print("i,|B_i|/n") 
 for k in sorted(b_sizes_total.keys()):
-    print(f"{k},{b_sizes_total[k] / N_SAMPLES / n:.10f}", flush=True)
+    print(f"{k},{b_sizes_total[k] / N_SAMPLES / n:.60f}")
