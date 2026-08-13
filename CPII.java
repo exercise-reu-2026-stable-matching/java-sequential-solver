@@ -1,4 +1,3 @@
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -135,11 +134,12 @@ abstract class CPII extends PIIBase {
         return count;
     }
 
-    static final BufferedOutputStream out = new BufferedOutputStream(System.out);
+    // static final BufferedOutputStream out = new BufferedOutputStream(System.out);
 
-    private static void printf(String format, Object... args) throws IOException {
-        out.write(String.format(format, args).getBytes());
-    }
+    // private static void printf(String format, Object... args) throws IOException {
+    //     out.write(String.format(format, args).getBytes());
+    //     out.flush();
+    // }
 
     /** Count the # of iterations until convergence. `initial` is the initial men's matches */
     final int countIters(Prefs prefs, Permutation initial) throws IOException {
@@ -148,9 +148,11 @@ abstract class CPII extends PIIBase {
         // long totalBSize = 0;
         for (int i = 0; ; i++) {
             // final int aSize = numUnstable(prefs, curr);
-            final int kSize = numMatched(curr);
-            final int bSize = n - kSize;
-            printf("%d,%d,%d\n", n, i + 1, bSize);
+            // final int kSize = numMatched(curr);
+            // final int bSize = n - kSize;
+            // assert bSize * bSize <= aSize;
+            // printf("%d,%d,%d,%d\n", n, i + 1, aSize, bSize);
+            // if (i > 0) assert 2 * bSize * bSize <= aSize;
 
             var result = iterationPhaseImpl(prefs, curr);
             if (result.done()) {
