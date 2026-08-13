@@ -1,0 +1,22 @@
+# Single-threaded Java emulator of CPII and PII
+- Programmers: Will Bradley (wjb247@cornell.edu) and Jeffrey Xu (jeffreyx24@gmail.com). Will wrote this README on 8/13/26, after the program ended.
+- We were two of four people working on stable matching as part of the 2026 Salisbury EXERCISE REU. We specifically investigated the average runtime of CPII.
+    - We had started out investigating when PII fails to converge, so there's some code for that as well
+    - We're planning to write a paper, so if you're reading this in 2027 or later you can hopefully find it on ArXiV or somewhere else.
+    - The other sub-team, Juniper and Matthew, investigated machine learning to guide PII and CPII. They worked on different branches of this repo I believe
+- We wrote almost everything without the help of AI. Claude helped us realize the tricks in CPIIFast.java, and I think we vibecoded a parser to read back preference matrix files. That would be clearly marked as written by AI though
+- The Java program is designed to be modular. If you want to simulate some other stable matching algorithm, for instance, you can hopefully just extend the class `PIIBase`
+    - This was probably premature abstraction. We had to break a lot of encapsulation to get things to work. For example, `Permutation.java` exposes its internal data and constructor so that we can put values of `-1` in it, because CPII uses partial matchings, so we modeled this as permutations with missing values. 
+- This directory is kind of a mess. Maybe ask AI to look at the git history. Sorry!
+- We make use of assertions to ensure correctness, so run `Main.java` with the `-ea` flag
+- We use [async-profiler](https://github.com/async-profiler/async-profiler) to make flamegraph.html to help measure the performance and bottlenecks of the program. I use `./profile` to start the profiler with the program automatically, but you probably need to change the `agentpath`
+- Some other scripts like `monitor`, `job`, `run_jobs` are for running with SLURM in the lab computers at the Salisbury HPCL
+- There are a ton of different branches for different experiments, but it's still not very well-organized.
+- `Bounds.lean` is a program I wrote to compute the recurrence `z_i` found at the end of our paper. It's probably not relevant for you unless you're extending our paper's results
+- `Recurrence.java` just computes the sequence `b_i`, which we conjecture to upper-bound `E[|B_i|]/n`. Also not relevant for simulating CPII
+- There are a bunch of scripts for processing the output of the Java program. Some of them probably break with the current version of the Java program since we used them so long ago. There are a bunch in `misc-python-scripts` that mostly calculate various averages from a newline-delimited text stream of observations. This was easier than computing the averages in the Java program
+- `3_cycle_states.txt` contains all the initial preference matrices that cause PII to cycle for n=3. 
+- `compressed-output` contains gzip-compressed outputs for when we were investigating which preferences caused CPII to not converge. I think they're ALL such preferences for n=4 or n=5, which was as far as we were able to enumerate fully. 
+    - They're compressed because it's a lot of output. 
+    - Past n=5 we used rejection sampling. The ML sub-team might know more about that. Again, Jeff and I last did this fairly early in the summer before we decided to switch to CPII
+- `graph-data` contains the data for making the graphs in the empirical results section of our paper. Each line is the number of iterations for CPII to converge. `graph-0k5.txt` is for n=500, `graph-1k.txt` is n=1000, `graph-1k5.txt` is n=1500, and so on.
